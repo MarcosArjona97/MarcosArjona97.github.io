@@ -1645,3 +1645,692 @@ SequenceNumber | string | Mandatory | Sequence Number.
 <aside class="success">
 Remember you will need to use an authentication token or the API Key in the header request for every transaction.
 </aside>
+
+# Bank Clearing Void
+
+## Create bank clearing void
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class BankClearingVoid
+    {
+        public static void CreateBankClearingVoid()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/BankClearingVoids");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var bankClearingVoid = new
+                {
+                    DeviceGuid = "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+                    ClearingGuid = "4d134bf6-f934-4c1c-ba93-89ca076ed43b"
+                };
+
+                string json = JsonConvert.SerializeObject(bankClearingVoid);
+
+                request.Headers.Add("Authorization", "Bearer DkpQk2A3K4Lwq6aFzbmkApOZWN28EowdVscW_sxY8_RTFt12xhnIa79bUmA12INI0YqKHwbMU5O5gMU_51E6wllvacKx68-mJ7F6GWnUkR2vFKaA-tdOJEqh0GD_61MGWWlXr9sxRNyH6ZzWqUS0-QdhcPLyFzJL-odqZ46I-Aouf3ixienzOnrL0m-zbExPAOnT58prg2dhB-rfIPBoF25rdokQ1KH4NFujgeF99qwIpObHeQQ25Qok7aJh5Spk");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+  "DeviceGuid" : "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+  "ClearingGuid" : "4d134bf6-f934-4c1c-ba93-89ca076ed43b"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "6da854f8-2327-4561-a223-ea9914116d10",
+    "status": "Transaction - Approved",
+    "timeStamp": "2020-11-24T08:48:32.45-06:00",
+    "deviceGuid": "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+    "clearingGuid": "4d134bf6-f934-4c1c-ba93-89ca076ed43b",
+    "processorStatusCode": "VOIDED",
+    "processorResponseMessage": "VOIDED",
+    "wasProcessed": true,
+    "relatedClearing": {
+        "guid": "4d134bf6-f934-4c1c-ba93-89ca076ed43b",
+        "status": "Transaction - Approved - Warning",
+        "timeStamp": "2020-11-24T08:36:25.29-06:00",
+        "deviceGuid": "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+        "amount": 3.50,
+        "grossAmount": 3.50,
+        "effectiveAmount": 0.00,
+        "refNumber": "22376",
+        "isBusinessPayment": true,
+        "customData": "order details",
+        "operationType": "Sale",
+        "settlementType": "ACH",
+        "customerLabel": "Patient",
+        "businessName": "Star Shoes California",
+        "customerID": "xt147",
+        "isSettled": false,
+        "processorStatusCode": "VOIDED",
+        "processorResponseMessage": "VOIDED",
+        "processorResponseMessageForMobile": "VOIDED",
+        "wasProcessed": true,
+        "customerReceipt": "326Nothing\\nBelgrano 383\n\\nNew York NY 10016\\n11/24/2020 02:36:25 PM\n\nDEBIT\\n\\nTotal:                        $3.50\\n--------------------------------------\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\n\\nSUBMITTED",
+        "bankAccount": {
+            "guid": "d4394cfb-1967-429b-92da-9f664c316527",
+            "routingNumber": "211274450",
+            "accountNumber": "441142020",
+            "accountNumberLastFour": "2020",
+            "nameOnAccount": "Joe Black",
+            "customer": {
+                "guid": "22fad359-2b37-470c-b6c1-d8fa66aa184a",
+                "firstName": "Joe",
+                "lastName": "Black",
+                "dateOfBirth": "1987-07-07T00:00:00",
+                "address1": "107 7th Av.",
+                "address2": "",
+                "zip": "10007",
+                "city": "Austin",
+                "state": "TX",
+                "country": "US",
+                "phone": "4207888807",
+                "email": "jblack@mailinator.com",
+                "ssN4": "1210",
+                "driverLicenseNumber": "12345678",
+                "driverLicenseState": "TX"
+            }
+        }
+    }
+}
+```
+
+This endpoint creates a bank clearing void.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/BankClearingVoids`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device Guid.
+ClearingGuid | string | Mandatory | Clearing Guid.
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Get bank clearing void
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class BankClearingVoid
+    {
+        public static void GetBankClearingVoid()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/BankClearingVoids/6da854f8-2327-4561-a223-ea9914116d10");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer DkpQk2A3K4Lwq6aFzbmkApOZWN28EowdVscW_sxY8_RTFt12xhnIa79bUmA12INI0YqKHwbMU5O5gMU_51E6wllvacKx68-mJ7F6GWnUkR2vFKaA-tdOJEqh0GD_61MGWWlXr9sxRNyH6ZzWqUS0-QdhcPLyFzJL-odqZ46I-Aouf3ixienzOnrL0m-zbExPAOnT58prg2dhB-rfIPBoF25rdokQ1KH4NFujgeF99qwIpObHeQQ25Qok7aJh5Spk");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "6da854f8-2327-4561-a223-ea9914116d10",
+    "status": "Transaction - Approved",
+    "timeStamp": "2020-11-24T08:48:32.45-06:00",
+    "deviceGuid": "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+    "clearingGuid": "4d134bf6-f934-4c1c-ba93-89ca076ed43b",
+    "processorStatusCode": "VOIDED",
+    "processorResponseMessage": "VOIDED",
+    "wasProcessed": true,
+    "relatedClearing": {
+        "guid": "4d134bf6-f934-4c1c-ba93-89ca076ed43b",
+        "status": "Transaction - Approved - Warning",
+        "timeStamp": "2020-11-24T08:36:25.29-06:00",
+        "deviceGuid": "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+        "amount": 3.50,
+        "grossAmount": 3.50,
+        "effectiveAmount": 0.00,
+        "refNumber": "22376",
+        "isBusinessPayment": true,
+        "customData": "order details",
+        "operationType": "Sale",
+        "settlementType": "ACH",
+        "customerLabel": "Patient",
+        "businessName": "Star Shoes California",
+        "customerID": "xt147",
+        "isSettled": false,
+        "processorStatusCode": "VOIDED",
+        "processorResponseMessage": "VOIDED",
+        "processorResponseMessageForMobile": "VOIDED",
+        "wasProcessed": true,
+        "customerReceipt": "326Nothing\\nBelgrano 383\n\\nNew York NY 10016\\n11/24/2020 02:36:25 PM\n\nDEBIT\\n\\nTotal:                        $3.50\\n--------------------------------------\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\n\\nSUBMITTED",
+        "bankAccount": {
+            "guid": "d4394cfb-1967-429b-92da-9f664c316527",
+            "routingNumber": "211274450",
+            "accountNumber": "441142020",
+            "accountNumberLastFour": "2020",
+            "nameOnAccount": "Joe Black",
+            "customer": {
+                "guid": "22fad359-2b37-470c-b6c1-d8fa66aa184a",
+                "firstName": "Joe",
+                "lastName": "Black",
+                "dateOfBirth": "1987-07-07T00:00:00",
+                "address1": "107 7th Av.",
+                "address2": "",
+                "zip": "10007",
+                "city": "Austin",
+                "state": "TX",
+                "country": "US",
+                "phone": "4207888807",
+                "email": "jblack@mailinator.com",
+                "ssN4": "1210",
+                "driverLicenseNumber": "12345678",
+                "driverLicenseState": "TX"
+            }
+        }
+    }
+}
+```
+
+This endpoint gets a bank clearing void.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/BankClearingVoids/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Bank clearing void’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+# Bank Clearing Return
+
+## Create bank clearing return
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class BankClearingReturn
+    {
+        public static void CreateBankClearingReturn()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/BankClearingReturns");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var bankClearingReturn = new
+                {
+                    DeviceGuid = "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+                    ClearingGuid = "8c7d4ce1-1cd2-4c92-ac24-86bf7ae1c0ed"
+                };
+
+                string json = JsonConvert.SerializeObject(bankClearingReturn);
+
+                request.Headers.Add("Authorization", "Bearer DkpQk2A3K4Lwq6aFzbmkApOZWN28EowdVscW_sxY8_RTFt12xhnIa79bUmA12INI0YqKHwbMU5O5gMU_51E6wllvacKx68-mJ7F6GWnUkR2vFKaA-tdOJEqh0GD_61MGWWlXr9sxRNyH6ZzWqUS0-QdhcPLyFzJL-odqZ46I-Aouf3ixienzOnrL0m-zbExPAOnT58prg2dhB-rfIPBoF25rdokQ1KH4NFujgeF99qwIpObHeQQ25Qok7aJh5Spk");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+  "DeviceGuid" : "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+  "ClearingGuid" : "8c7d4ce1-1cd2-4c92-ac24-86bf7ae1c0ed"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "f76fda9b-3632-441b-aa8c-f98ff4389ade",
+    "status": "Transaction - Approved - Warning",
+    "timeStamp": "2020-11-24T09:05:12.05-06:00",
+    "deviceGuid": "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+    "clearingGuid": "8c7d4ce1-1cd2-4c92-ac24-86bf7ae1c0ed",
+    "processorStatusCode": "HELD",
+    "processorResponseMessage": "HELD",
+    "wasProcessed": true,
+    "relatedClearing": {
+        "guid": "8c7d4ce1-1cd2-4c92-ac24-86bf7ae1c0ed",
+        "status": "Transaction - Approved - Warning",
+        "timeStamp": "2020-11-24T08:53:17.61-06:00",
+        "deviceGuid": "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+        "amount": 3.50,
+        "grossAmount": 3.50,
+        "effectiveAmount": 0.00,
+        "refNumber": "22377",
+        "isBusinessPayment": true,
+        "customData": "order details",
+        "operationType": "Sale",
+        "settlementType": "ACH",
+        "customerLabel": "Patient",
+        "businessName": "Star Shoes California",
+        "customerID": "xt147",
+        "isSettled": true,
+        "processorStatusCode": "HELD",
+        "processorResponseMessage": "HELD",
+        "processorResponseMessageForMobile": "HELD",
+        "processorTransactionStatus": "Debit Sent",
+        "processorSettlementStatus": "Credit Sent",
+        "wasProcessed": true,
+        "customerReceipt": "326Nothing\\nBelgrano 383\n\\nNew York NY 10016\\n11/24/2020 02:53:17 PM\n\nDEBIT\\n\\nTotal:                        $3.50\\n--------------------------------------\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\n\\nSUBMITTED",
+        "bankAccount": {
+            "guid": "cb217796-a2c9-476d-bceb-6fdcf600def6",
+            "routingNumber": "211274450",
+            "accountNumber": "441142020",
+            "accountNumberLastFour": "2020",
+            "nameOnAccount": "Joe Black",
+            "customer": {
+                "guid": "8e995f82-025f-45ae-a7e3-54126af4e7d4",
+                "firstName": "Joe",
+                "lastName": "Black",
+                "dateOfBirth": "1987-07-07T00:00:00",
+                "address1": "107 7th Av.",
+                "address2": "",
+                "zip": "10007",
+                "city": "Austin",
+                "state": "TX",
+                "country": "US",
+                "phone": "4207888807",
+                "email": "jblack@mailinator.com",
+                "ssN4": "1210",
+                "driverLicenseNumber": "12345678",
+                "driverLicenseState": "TX"
+            }
+        }
+    }
+}
+```
+
+This endpoint creates a bank clearing return.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/BankClearingReturns`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device Guid.
+ClearingGuid | string | Mandatory | Clearing Guid.
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Get bank clearing return
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class BankClearingReturn
+    {
+        public static void GetBankClearingReturn()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/BankClearingReturns/f76fda9b-3632-441b-aa8c-f98ff4389ade");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer DkpQk2A3K4Lwq6aFzbmkApOZWN28EowdVscW_sxY8_RTFt12xhnIa79bUmA12INI0YqKHwbMU5O5gMU_51E6wllvacKx68-mJ7F6GWnUkR2vFKaA-tdOJEqh0GD_61MGWWlXr9sxRNyH6ZzWqUS0-QdhcPLyFzJL-odqZ46I-Aouf3ixienzOnrL0m-zbExPAOnT58prg2dhB-rfIPBoF25rdokQ1KH4NFujgeF99qwIpObHeQQ25Qok7aJh5Spk");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "f76fda9b-3632-441b-aa8c-f98ff4389ade",
+    "status": "Transaction - Approved - Warning",
+    "timeStamp": "2020-11-24T09:05:12.05-06:00",
+    "deviceGuid": "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+    "clearingGuid": "8c7d4ce1-1cd2-4c92-ac24-86bf7ae1c0ed",
+    "processorStatusCode": "HELD",
+    "processorResponseMessage": "HELD",
+    "wasProcessed": true,
+    "relatedClearing": {
+        "guid": "8c7d4ce1-1cd2-4c92-ac24-86bf7ae1c0ed",
+        "status": "Transaction - Approved - Warning",
+        "timeStamp": "2020-11-24T08:53:17.61-06:00",
+        "deviceGuid": "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+        "amount": 3.50,
+        "grossAmount": 3.50,
+        "effectiveAmount": 0.00,
+        "refNumber": "22377",
+        "isBusinessPayment": true,
+        "customData": "order details",
+        "operationType": "Sale",
+        "settlementType": "ACH",
+        "customerLabel": "Patient",
+        "businessName": "Star Shoes California",
+        "customerID": "xt147",
+        "isSettled": true,
+        "processorStatusCode": "HELD",
+        "processorResponseMessage": "HELD",
+        "processorResponseMessageForMobile": "HELD",
+        "processorTransactionStatus": "Debit Sent",
+        "processorSettlementStatus": "Credit Sent",
+        "wasProcessed": true,
+        "customerReceipt": "326Nothing\\nBelgrano 383\n\\nNew York NY 10016\\n11/24/2020 02:53:17 PM\n\nDEBIT\\n\\nTotal:                        $3.50\\n--------------------------------------\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\n\\nSUBMITTED",
+        "bankAccount": {
+            "guid": "cb217796-a2c9-476d-bceb-6fdcf600def6",
+            "routingNumber": "211274450",
+            "accountNumber": "441142020",
+            "accountNumberLastFour": "2020",
+            "nameOnAccount": "Joe Black",
+            "customer": {
+                "guid": "8e995f82-025f-45ae-a7e3-54126af4e7d4",
+                "firstName": "Joe",
+                "lastName": "Black",
+                "dateOfBirth": "1987-07-07T00:00:00",
+                "address1": "107 7th Av.",
+                "address2": "",
+                "zip": "10007",
+                "city": "Austin",
+                "state": "TX",
+                "country": "US",
+                "phone": "4207888807",
+                "email": "jblack@mailinator.com",
+                "ssN4": "1210",
+                "driverLicenseNumber": "12345678",
+                "driverLicenseState": "TX"
+            }
+        }
+    }
+}
+```
+
+This endpoint gets a bank clearing return.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/BankClearingReturns/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Bank clearing return’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
