@@ -4985,3 +4985,3308 @@ guid | Capture’s guid to get
 <aside class="success">
 Remember you will need to use an authentication token or the API Key in the header request for every transaction.
 </aside>
+
+# Void
+
+## Create void
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Void
+    {
+        public static void CreateVoid()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/void");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var void1 = new
+                {
+                    DeviceGuid = "b29725af-b067-4a35-9819-bbb31bdf8808",
+                    SaleGuid = "c7a9a2a6-08bb-42c5-acc6-f20d39c7f5de",  
+                    VoidReason = "DEVICE_TIMEOUT"
+                };
+
+                string json = JsonConvert.SerializeObject(void1);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+  "DeviceGuid" : "b29725af-b067-4a35-9819-bbb31bdf8808",
+  "SaleGuid": "c7a9a2a6-08bb-42c5-acc6-f20d39c7f5de",
+  "VoidReason": "DEVICE_TIMEOUT",
+  "SemiIntegrated": true
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "saleGuid": "1e0f6e4b-2eb4-475f-b2c3-d49746ac244f",
+    "batchStatus": "Batch - Open",
+    "timeStamp": "2020-11-25T07:03:16.47-06:00",
+    "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+    "saleGuid": "c7a9a2a6-08bb-42c5-acc6-f20d39c7f5de",
+    "status": "Transaction - Approved",
+    "voidReason": "DEVICE_TIMEOUT",
+    "processorStatusCode": "A0000",
+    "wasProcessed": true,
+    "batchGuid": "1238635a-63f4-4de3-8cc3-4e6958840dc0",
+    "authCode": "VTLMC1",
+    "refNumber": "24814572",
+    "invoiceNumber": "11518",
+    "customerReceipt": "CHOICE MERCHANT SOLUTIONS\\n8320 S HARDY DR\\nTEMPE AZ 85284\\n11/25/2020 06:03:18\\n\\nCREDIT - VOID\\n\\nCARD # : **** **** **** 0213\\nCARD TYPE :MASTERCARD\\nEntry Mode : MANUAL\\n\\nTRANSACTION ID : 24814572\\nInvoice number : 11518\\nAUTH CODE : VTLMC1\\nVoid Amount:                    $19.74\\n--------------------------------------\\n\\n\\n\\nJohn Doe\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\nAPPROVED\\n\\n\\n\\n\\nCustomer Copy\\n",
+    "sale": {
+        "guid": "c7a9a2a6-08bb-42c5-acc6-f20d39c7f5de",
+        "status": "Transaction - Approved",
+        "batchStatus": "Batch - Open",
+        "timeStamp": "2020-11-25T07:00:50.87-06:00",
+        "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+        "amount": 19.74,
+        "effectiveAmount": 0.00,
+        "grossAmount": 19.74,
+        "orderNumber": "11518",
+        "orderDate": "2020-11-24T00:00:00",
+        "cardDataSource": "INTERNET",
+        "customerLabel": "Patient",
+        "businessName": "Star Shoes California",
+        "customerID": "xt147",
+        "batchGuid": "1238635a-63f4-4de3-8cc3-4e6958840dc0",
+        "processorStatusCode": "A0000",
+        "processorResponseMessage": "Success",
+        "wasProcessed": true,
+        "authCode": "VTLMC1",
+        "refNumber": "24814572",
+        "customerReceipt": "CHOICE MERCHANT SOLUTIONS\\n8320 S HARDY DR\\nTEMPE AZ 85284\\n11/25/2020 06:00:51\\n\\nCREDIT - SALE\\n\\nCARD # : **** **** **** 0213\\nCARD TYPE :MASTERCARD\\nEntry Mode : MANUAL\\n\\nTRANSACTION ID : 24814572\\n\\nAUTH CODE : VTLMC1\\nSubtotal:                       $19.74\\n--------------------------------------\\nTotal:                          $19.74\\n--------------------------------------\\n\\n\\n\\nJohn Doe\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\nAPPROVED\\n\\n\\n\\n\\nCustomer Copy\\n",
+        "customData": "order details",
+        "generatedBy": "maxduplessy",
+        "card": {
+            "card.first6": "530676",
+            "card.last4": "0213",
+            "cardNumber": "1zcGT7J4pkGh0213",
+            "cardHolderName": "John Doe",
+            "cardType": "Mastercard",
+            "expirationDate": "2022-07",
+            "customer": {
+                "guid": "5645931c-8f27-46c4-9569-67820814acd5",
+                "firstName": "John",
+                "lastName": "Doe",
+                "dateOfBirth": "1987-07-07T00:00:00",
+                "address1": "107 7th Av.",
+                "address2": "",
+                "zip": "10007",
+                "city": "New York",
+                "state": "NY",
+                "country": "US",
+                "phone": "9177563007",
+                "email": "johnd@mailinator.com",
+                "ssN4": "1210",
+                "driverLicenseNumber": "12345678",
+                "driverLicenseState": "TX"
+            }
+        },
+        "associateCustomerCard": true,
+        "addressVerificationCode": "N",
+        "addressVerificationResult": "No Match",
+        "cvvVerificationCode": "M",
+        "cvvVerificationResult": "Passed"
+    }
+}
+```
+
+You can run a Void when you need to cancel a sale that has not been settled yet or an authOnly. To void a sale you need to provide the SaleGuid or SaleReferenceNumber that you received when you ran the Sale. To void an authOnly you need to provide the AuthOnlyGuid or AuthOnlyReferenceNumber that you received when you ran the authOnly.
+
+This endpoint creates a void.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/void`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device’s Guid.
+SaleGuid | string | Mandatory when **SaleReferenceNumber, AuthOnlyGuid and AuthOnlyReferenceNumber** field are not sent | Sale’s Guid.
+SaleReferenceNumber | string | Mandatory when **SaleGuid, AuthOnlyGuid and AuthOnlyReferenceNumber** field are not sent | SaleReferenceNumber.
+AuthOnlyGuid | string | Mandatory when **SaleGuid, SaleReferenceNumber and AuthOnlyReferenceNumber** field are not sent | AuthOnlyGuid’s Guid.
+AuthOnlyReferenceNumber | string | Mandatory when **SaleGuid, SaleReferenceNumber and AuthOnlyGuid** field are not sent | AuthOnlyReferenceNumber.
+VoidReason | string | Optional | Indicates the reason the transaction was voided.<br><br>Allowed values:<br><br>**1. POST_AUTH_USER_DECLINE**<br>**2. DEVICE_TIMEOUT**<br>**3. DEVICE_UNAVAILABLE**<br>**4. PARTIAL_REVERSAL**<br>**5. TORN_TRANSACTION**<br>**6. POST_AUTH_CHIP_DECLINE**
+
+**Note: Send either SaleGuid, SaleReferenceNumber, AuthOnlyGuid or  AuthOnlyReferenceNumber field in a request.**
+
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Get void
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Void
+    {
+        public static void GetVoid()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/void/1e0f6e4b-2eb4-475f-b2c3-d49746ac244f");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "1e0f6e4b-2eb4-475f-b2c3-d49746ac244f",
+    "batchStatus": "Batch - Open",
+    "timeStamp": "2020-11-25T07:03:16.47-06:00",
+    "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+    "saleGuid": "c7a9a2a6-08bb-42c5-acc6-f20d39c7f5de",
+    "status": "Transaction - Approved",
+    "voidReason": "DEVICE_TIMEOUT",
+    "processorStatusCode": "A0000",
+    "wasProcessed": true,
+    "batchGuid": "1238635a-63f4-4de3-8cc3-4e6958840dc0",
+    "authCode": "VTLMC1",
+    "refNumber": "24814572",
+    "invoiceNumber": "11518",
+    "customerReceipt": "CHOICE MERCHANT SOLUTIONS\\n8320 S HARDY DR\\nTEMPE AZ 85284\\n11/25/2020 06:03:18\\n\\nCREDIT - VOID\\n\\nCARD # : **** **** **** 0213\\nCARD TYPE :MASTERCARD\\nEntry Mode : MANUAL\\n\\nTRANSACTION ID : 24814572\\nInvoice number : 11518\\nAUTH CODE : VTLMC1\\nVoid Amount:                    $19.74\\n--------------------------------------\\n\\n\\n\\nJohn Doe\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\nAPPROVED\\n\\n\\n\\n\\nCustomer Copy\\n",
+    "sale": {
+        "guid": "c7a9a2a6-08bb-42c5-acc6-f20d39c7f5de",
+        "status": "Transaction - Approved",
+        "batchStatus": "Batch - Open",
+        "timeStamp": "2020-11-25T07:00:50.87-06:00",
+        "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+        "amount": 19.74,
+        "effectiveAmount": 0.00,
+        "grossAmount": 19.74,
+        "orderNumber": "11518",
+        "orderDate": "2020-11-24T00:00:00",
+        "cardDataSource": "INTERNET",
+        "customerLabel": "Patient",
+        "businessName": "Star Shoes California",
+        "customerID": "xt147",
+        "batchGuid": "1238635a-63f4-4de3-8cc3-4e6958840dc0",
+        "processorStatusCode": "A0000",
+        "processorResponseMessage": "Success",
+        "wasProcessed": true,
+        "authCode": "VTLMC1",
+        "refNumber": "24814572",
+        "customerReceipt": "CHOICE MERCHANT SOLUTIONS\\n8320 S HARDY DR\\nTEMPE AZ 85284\\n11/25/2020 06:00:51\\n\\nCREDIT - SALE\\n\\nCARD # : **** **** **** 0213\\nCARD TYPE :MASTERCARD\\nEntry Mode : MANUAL\\n\\nTRANSACTION ID : 24814572\\n\\nAUTH CODE : VTLMC1\\nSubtotal:                       $19.74\\n--------------------------------------\\nTotal:                          $19.74\\n--------------------------------------\\n\\n\\n\\nJohn Doe\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\nAPPROVED\\n\\n\\n\\n\\nCustomer Copy\\n",
+        "customData": "order details",
+        "generatedBy": "maxduplessy",
+        "card": {
+            "card.first6": "530676",
+            "card.last4": "0213",
+            "cardNumber": "1zcGT7J4pkGh0213",
+            "cardHolderName": "John Doe",
+            "cardType": "Mastercard",
+            "expirationDate": "2022-07",
+            "customer": {
+                "guid": "5645931c-8f27-46c4-9569-67820814acd5",
+                "firstName": "John",
+                "lastName": "Doe",
+                "dateOfBirth": "1987-07-07T00:00:00",
+                "address1": "107 7th Av.",
+                "address2": "",
+                "zip": "10007",
+                "city": "New York",
+                "state": "NY",
+                "country": "US",
+                "phone": "9177563007",
+                "email": "johnd@mailinator.com",
+                "ssN4": "1210",
+                "driverLicenseNumber": "12345678",
+                "driverLicenseState": "TX"
+            }
+        },
+        "associateCustomerCard": true,
+        "addressVerificationCode": "N",
+        "addressVerificationResult": "No Match",
+        "cvvVerificationCode": "M",
+        "cvvVerificationResult": "Passed"
+    }
+}
+```
+
+This endpoint gets a void.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/void/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Void’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+# Return
+
+## Create return
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Return
+    {
+        public static void CreateReturn()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/returns");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var returns = new
+                {
+                    DeviceGuid = "b29725af-b067-4a35-9819-bbb31bdf8808",
+                    SaleGuid = "b4084e11-884d-468c-84d9-614c5b986fde",
+                    Amount = 19.74
+                };
+
+                string json = JsonConvert.SerializeObject(returns);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+  "DeviceGuid" : "b29725af-b067-4a35-9819-bbb31bdf8808",
+  "SaleGuid": "b4084e11-884d-468c-84d9-614c5b986fde",
+  "Amount": 19.74
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "9fb17f4e-b508-48d3-bd77-bb6813b42620",
+    "batchStatus": "Batch - Open",
+    "timeStamp": "2020-11-25T07:17:24.15-06:00",
+    "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+    "saleGuid": "b4084e11-884d-468c-84d9-614c5b986fde",
+    "status": "Transaction - Approved",
+    "amount": 19.74,
+    "StatementDescription": "This atribute is sent by the backend in the response",
+    "batchGuid": "58e8a0ad-d167-4015-a4b1-904b1e7f2b26",
+    "processorStatusCode": "A0014",
+    "wasProcessed": true,
+    "authCode": "VTLMC1",
+    "refNumber": "24814670",
+    "invoiceNumber": "11518",
+    "customerReceipt": "CHOICE MERCHANT SOLUTIONS\\n8320 S HARDY DR\\nTEMPE AZ 85284\\n11/25/2020 06:17:25\\n\\nCREDIT - VOID\\n\\nCARD # : **** **** **** 0213\\nCARD TYPE :MASTERCARD\\nEntry Mode : MANUAL\\n\\nTRANSACTION ID : 24814670\\nInvoice number : 11518\\nAUTH CODE : VTLMC1\\nVoid Amount:                    $19.74\\n--------------------------------------\\n\\n\\n\\nJohn Doe\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\nAPPROVED\\n\\n\\n\\n\\nCustomer Copy\\n",
+    "sale": {
+        "saleGuid": "b4084e11-884d-468c-84d9-614c5b986fde",
+        "status": "Transaction - Approved",
+        "batchStatus": "Batch - Closed",
+        "timeStamp": "2020-11-25T07:15:27.28-06:00",
+        "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+        "amount": 19.74,
+        "effectiveAmount": 19.74,
+        "grossAmount": 19.74,
+        "orderNumber": "11518",
+        "orderDate": "2020-11-24T00:00:00",
+        "cardDataSource": "INTERNET",
+        "customerLabel": "Patient",
+        "businessName": "Star Shoes California",
+        "customerID": "xt147",
+        "batchGuid": "b8d73296-e397-45c0-bb43-ba064e9750ac",
+        "processorStatusCode": "A0000",
+        "processorResponseMessage": "Success",
+        "wasProcessed": true,
+        "authCode": "VTLMC1",
+        "refNumber": "24814670",
+        "customerReceipt": "CHOICE MERCHANT SOLUTIONS\\n8320 S HARDY DR\\nTEMPE AZ 85284\\n11/25/2020 06:15:27\\n\\nCREDIT - SALE\\n\\nCARD # : **** **** **** 0213\\nCARD TYPE :MASTERCARD\\nEntry Mode : MANUAL\\n\\nTRANSACTION ID : 24814670\\n\\nAUTH CODE : VTLMC1\\nSubtotal:                       $19.74\\n--------------------------------------\\nTotal:                          $19.74\\n--------------------------------------\\n\\n\\n\\nJohn Doe\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\nAPPROVED\\n\\n\\n\\n\\nCustomer Copy\\n",
+        "customData": "order details",
+        "generatedBy": "maxduplessy",
+        "card": {
+            "card.first6": "530676",
+            "card.last4": "0213",
+            "cardNumber": "1zcGT7J4pkGh0213",
+            "cardHolderName": "John Doe",
+            "cardType": "Mastercard",
+            "expirationDate": "2022-07",
+            "customer": {
+                "guid": "4b63d92b-c0bf-436c-879d-5cacfcf1b708",
+                "firstName": "John",
+                "lastName": "Doe",
+                "dateOfBirth": "1987-07-07T00:00:00",
+                "address1": "107 7th Av.",
+                "address2": "",
+                "zip": "10007",
+                "city": "New York",
+                "state": "NY",
+                "country": "US",
+                "phone": "9177563007",
+                "email": "johnd@mailinator.com",
+                "ssN4": "1210",
+                "driverLicenseNumber": "12345678",
+                "driverLicenseState": "TX"
+            }
+        },
+        "associateCustomerCard": true,
+        "addressVerificationCode": "N",
+        "addressVerificationResult": "No Match",
+        "cvvVerificationCode": "M",
+        "cvvVerificationResult": "Passed"
+    }
+}
+```
+
+You can run a Return transaction when you need to refund either a partial or the full amount of a sale that has been settled. The Return amount doesn’t need to be the same as the total amount originally charged in the sale. To refund a sale you need to provide the SaleGuid or SaleReferenceNumber that you received when you ran the Sale.
+
+This endpoint creates a return.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/returns`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device’s Guid.
+SaleGuid | string | Mandatory when **SaleReferenceNumber** field is not sent | Sale’s Guid.
+SaleReferenceNumber | string | Mandatory when **SaleGuid** field is not sent | SaleReferenceNumber.
+Amount | decimal | Mandatory | Transaction's amount. Min. amt.: $0.50
+
+**Note: Send either SaleGuid or SaleReferenceNumber field in a request.**
+
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Get return
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Return
+    {
+        public static void GetReturn()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/returns/9fb17f4e-b508-48d3-bd77-bb6813b42620");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "9fb17f4e-b508-48d3-bd77-bb6813b42620",
+    "batchStatus": "Batch - Open",
+    "timeStamp": "2020-11-25T07:17:24.15-06:00",
+    "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+    "saleGuid": "b4084e11-884d-468c-84d9-614c5b986fde",
+    "status": "Transaction - Approved",
+    "amount": 19.74,
+    "batchGuid": "58e8a0ad-d167-4015-a4b1-904b1e7f2b26",
+    "processorStatusCode": "A0014",
+    "wasProcessed": true,
+    "authCode": "VTLMC1",
+    "refNumber": "24814670",
+    "invoiceNumber": "11518",
+    "customerReceipt": "CHOICE MERCHANT SOLUTIONS\\n8320 S HARDY DR\\nTEMPE AZ 85284\\n11/25/2020 06:17:25\\n\\nCREDIT - VOID\\n\\nCARD # : **** **** **** 0213\\nCARD TYPE :MASTERCARD\\nEntry Mode : MANUAL\\n\\nTRANSACTION ID : 24814670\\nInvoice number : 11518\\nAUTH CODE : VTLMC1\\nVoid Amount:                    $19.74\\n--------------------------------------\\n\\n\\n\\nJohn Doe\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\nAPPROVED\\n\\n\\n\\n\\nCustomer Copy\\n",
+    "sale": {
+        "guid": "b4084e11-884d-468c-84d9-614c5b986fde",
+        "status": "Transaction - Approved",
+        "batchStatus": "Batch - Closed",
+        "timeStamp": "2020-11-25T07:15:27.28-06:00",
+        "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+        "amount": 19.74,
+        "effectiveAmount": 0.00,
+        "grossAmount": 19.74,
+        "orderNumber": "11518",
+        "orderDate": "2020-11-24T00:00:00",
+        "cardDataSource": "INTERNET",
+        "customerLabel": "Patient",
+        "businessName": "Star Shoes California",
+        "customerID": "xt147",
+        "batchGuid": "b8d73296-e397-45c0-bb43-ba064e9750ac",
+        "processorStatusCode": "A0000",
+        "processorResponseMessage": "Success",
+        "wasProcessed": true,
+        "authCode": "VTLMC1",
+        "refNumber": "24814670",
+        "customerReceipt": "CHOICE MERCHANT SOLUTIONS\\n8320 S HARDY DR\\nTEMPE AZ 85284\\n11/25/2020 06:15:27\\n\\nCREDIT - SALE\\n\\nCARD # : **** **** **** 0213\\nCARD TYPE :MASTERCARD\\nEntry Mode : MANUAL\\n\\nTRANSACTION ID : 24814670\\n\\nAUTH CODE : VTLMC1\\nSubtotal:                       $19.74\\n--------------------------------------\\nTotal:                          $19.74\\n--------------------------------------\\n\\n\\n\\nJohn Doe\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\nAPPROVED\\n\\n\\n\\n\\nCustomer Copy\\n",
+        "customData": "order details",
+        "generatedBy": "maxduplessy",
+        "card": {
+            "card.first6": "530676",
+            "card.last4": "0213",
+            "cardNumber": "1zcGT7J4pkGh0213",
+            "cardHolderName": "John Doe",
+            "cardType": "Mastercard",
+            "expirationDate": "2022-07",
+            "customer": {
+                "guid": "4b63d92b-c0bf-436c-879d-5cacfcf1b708",
+                "firstName": "John",
+                "lastName": "Doe",
+                "dateOfBirth": "1987-07-07T00:00:00",
+                "address1": "107 7th Av.",
+                "address2": "",
+                "zip": "10007",
+                "city": "New York",
+                "state": "NY",
+                "country": "US",
+                "phone": "9177563007",
+                "email": "johnd@mailinator.com",
+                "ssN4": "1210",
+                "driverLicenseNumber": "12345678",
+                "driverLicenseState": "TX"
+            }
+        },
+        "associateCustomerCard": true,
+        "addressVerificationCode": "N",
+        "addressVerificationResult": "No Match",
+        "cvvVerificationCode": "M",
+        "cvvVerificationResult": "Passed"
+    }
+}
+```
+
+This endpoint gets a return.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/returns/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Return’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+# Verify
+
+## Create verify
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Verify
+    {
+        public static void CreateVerify()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Verify");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var verify = new
+                {
+                    DeviceGuid = "b29725af-b067-4a35-9819-bbb31bdf8808",
+                    Card = new
+                    {
+                        CardNumber = "4532922657097402",
+                        CardHolderName = "Justin Troudeau",
+                        Cvv2 = "999",
+                        ExpirationDate = "2012",
+                        Customer = new
+                        {
+                            FirstName = "Justin",
+                            LastName = "Troudeau",
+                            Phone = "9177563051",
+                            City = "New York",
+                            State = "NY",
+                            Country = "US",
+                            Email = "justint@mailinator.com",
+                            Address1 = "111 11th Av.",
+                            Address2 = "",
+                            Zip = "10011",
+                            DateOfBirth = "1991-11-11",
+                            DriverLicenseNumber = "12345678",
+                            DriverLicenseState = "TX",
+                            SSN4 = "1210"
+                        }
+                    }
+                };
+
+                string json = JsonConvert.SerializeObject(verify);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+  "DeviceGuid" : "b29725af-b067-4a35-9819-bbb31bdf8808",
+  "Card":
+  {
+    "CardNumber" : "4532922657097402",
+    "CardHolderName" : "Justin Troudeau",
+    "Cvv2" : "999",
+    "ExpirationDate" : "2012",
+    "Customer":
+    {
+      "FirstName" : "Justin",
+      "LastName" : "Troudeau",
+      "Phone" : "9177563051",
+      "City" : "New York",
+      "State" : "NY",
+      "Country" : "US",
+      "Email" : "justint@mailinator.com",
+      "Address1" : "111 11th Av.",
+      "Address2" : "",
+      "Zip" : "10011",
+      "DateOfBirth" : "1991-11-11",
+      "DriverLicenseNumber" : "12345678",
+      "DriverLicenseState" : "TX",
+      "SSN4" : "1210"
+    }
+  }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "496b8523-7b36-42a4-9026-2b70cf684249",
+    "status": "Transaction - Approved",
+    "timeStamp": "2020-11-25T07:24:25.29-06:00",
+    "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+    "card": {
+        "card.irst6": "453292",
+        "card.last4": "7402",
+        "cardNumber": "hNDbeGr7VBgY7402",
+        "cardHolderName": "Justin Troudeau",
+        "cardType": "Visa",
+        "expirationDate": "2020-12",
+        "customer": {
+            "guid": "7879844d-33ff-4a2e-af5b-b72ca9487664",
+            "firstName": "Justin",
+            "lastName": "Troudeau",
+            "dateOfBirth": "1991-11-11T00:00:00",
+            "address1": "111 11th Av.",
+            "address2": "",
+            "zip": "10011",
+            "city": "New York",
+            "country": "US",
+            "phone": "9177563051",
+            "email": "justint@mailinator.com",
+            "ssN4": "1210",
+            "driverLicenseNumber": "12345678"
+        }
+    },
+    "cardDataSource": "INTERNET",
+    "processorStatusCode": "A0000",
+    "wasProcessed": true
+}
+```
+
+The Verify transaction is used when you want to know if the card data you have is valid and it’s ready to run other transactions like Auth Only or Sale. Therefore we are talking about a $0.00 amount transaction, no money is moved.
+
+This endpoint creates a verify.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Verify`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device’s Guid.
+ |  | 
+**Card** |  | 
+CardNumber | string | Mandatory | Card number. Must be 16 characters.  (example: 4532538795426624) or token (example: FfL7exC7Xe2y6624).
+CardHolderName | string | Optional | Cardholder's name.
+Cvv2 | string | Optional | This is the three or four digit CVV code at the back side of the credit and debit card.
+ExpirationDate | date | Optional with Token | Card's expiry date in the YYMM format.
+Customer | object | Optional | Customer.
+ |  | 
+**Customer** |  | 
+FirstName | string | Optional | Customer's first name.
+LastName | string | Optional | Customer's last name.
+Phone | string | Optional | Customer's phone number. The phone number must be syntactically correct. For example, 4152345678.
+City | string | Optional | Customer's city.
+State | string | Optional | Customer's short name state. The ISO 3166-2 CA and US state or province code of a customer. Length = 2.
+Country | string | Optional | Customer's country. The ISO country code of a customer’s country. Length = 2 or 3.
+Email | string | Optional | Customer's valid email address.
+Address1 | string | Optional | Customer's address.
+Address2 | string | Optional | Customer's address line 2.
+Zip | string | Optional | Customer's zipcode. Length = 5.
+DateOfBirth | date | Optional | Customer's date of birth.<br><br>Allowed format:<br><br>YYYY-MM-DD.<br>For example: 2002-05-30
+DriverLicenseNumber | string | Optional | Customer's driver license number.
+DriverLicenseState | string | Mandatory when DriverLicenseNumber is provided | Customer's driver license short name state. The ISO 3166-2 CA and US state or province code of a customer. Length = 2.
+SSN4 | string | Mandatory when DOB is not submitted | Customer's social security number.
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Get verify
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Verify
+    {
+        public static void GetVerify()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Verify/496b8523-7b36-42a4-9026-2b70cf684249");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+ 
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "496b8523-7b36-42a4-9026-2b70cf684249",
+    "status": "Transaction - Approved",
+    "timeStamp": "2020-11-25T07:24:25.29-06:00",
+    "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+    "card": {
+        "card.first6": "453292",
+        "card.last4": "7402",
+        "cardNumber": "hNDbeGr7VBgY7402",
+        "cardHolderName": "Justin Troudeau",
+        "cardType": "Visa",
+        "expirationDate": "2020-12",
+        "customer": {
+            "guid": "7879844d-33ff-4a2e-af5b-b72ca9487664",
+            "firstName": "Justin",
+            "lastName": "Troudeau",
+            "dateOfBirth": "1991-11-11T00:00:00",
+            "address1": "111 11th Av.",
+            "address2": "",
+            "zip": "10011",
+            "city": "New York",
+            "country": "US",
+            "phone": "9177563051",
+            "email": "justint@mailinator.com",
+            "ssN4": "1210",
+            "driverLicenseNumber": "12345678"
+        }
+    },
+    "cardDataSource": "INTERNET",
+    "processorStatusCode": "A0000",
+    "wasProcessed": true
+}
+```
+
+This endpoint gets a verify.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/Verify/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Verify’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+# Tokenization
+
+## Create tokenization
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Tokenization
+    {
+        public static void CreateTokenization()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/tokenization");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var tokenization = new
+                {
+                    DeviceGuid = "F050E264-EABF-433E-8C81-916DFE110159",
+                    Card = new
+                    {
+                        CardNumber = "4024007194311436",
+                        CardHolderName = "John Doe",
+                        ExpirationDate = "2507",
+                        Customer = new
+                        {
+                            FirstName = "John",
+                            LastName = "Doe"
+                        }
+                    }
+                };
+
+                string json = JsonConvert.SerializeObject(tokenization);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "DeviceGuid": "F050E264-EABF-433E-8C81-916DFE110159",
+    "Card": {
+        "CardNumber": "4024007194311436",
+        "CardHolderName": "John Doe",
+        "ExpirationDate": "2507",
+        "Customer": {
+            "FirstName": "John",
+            "LastName": "Doe"
+        }
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "a2b8842a-a248-4759-ad71-9607a472e7cc",
+    "status": "Transaction - Approved",
+    "timeStamp": "2021-07-16T15:36:07.31",
+    "deviceGuid": "F050E264-EABF-433E-8C81-916DFE110159",
+    "cardDataSource": "INTERNET",
+    "processorStatusCode": "A0000",
+    "card": {
+        "card.first6": "402400",
+        "card.last4": "1436",
+        "cardNumber": "XR6ngXrNGdD31436",
+        "cardHolderName": "John Doe",
+        "cardType": "Visa",
+        "expirationDate": "2025-07"
+    }
+}
+```
+
+The Tokenization service is used when you want to obtain a tokenized value of the card number but no validation to be performed at the issuing bank.
+
+This endpoint creates a tokenization.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/tokenization`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device’s Guid.
+ |  | 
+**Card** |  | 
+CardNumber | string | Mandatory | Card number. Must be 16 characters.
+CardHolderName | string | Optional | Cardholder's name.
+ExpirationDate | date | Mandatory | Card's expiry date in the YYMM format.
+Customer | object | Optional | Customer.
+ |  | 
+**Customer** |  | 
+FirstName | string | Optional | Customer's first name.
+LastName | string | Optional | Customer's last name.
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+# Recurring Billing
+
+## Create recurring billing
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class RecurringBilling
+    {
+        public static void CreateRecurringBilling()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/recurringBillings");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var recurringBilling = new
+                {
+                    DeviceGuid = "b29725af-b067-4a35-9819-bbb31bdf8808",
+                    Amount = 10.50,
+                    Interval = "monthly",
+                    IntervalValue = "april, may, june",
+                    StartDate = "2021-05-13T00:00:01.000Z",
+                    EndDate = "2023-04-01T00:00:01.000Z",
+                    PaymentCount = "",
+                    ScheduleNotes = "Cable",
+                    Description = "Description",
+                    Card = new
+                    {
+                        CardNumber = "4556395004716019",
+                        CardHolderName = "John Doe",
+                        Cvv2 = "999",
+                        ExpirationDate = "2012",
+                        Customer = new
+                        {
+                            FirstName = "John",
+                            LastName = "Doe",
+                            Phone = "9865123654",
+                            City = "New York",
+                            State = "NY",
+                            Country = "US",
+                            Email = "johnd@mailinator.com",
+                            Address1 = "12th Ave. 5472",
+                            Address2 = "",
+                            Zip = "10003",
+                            DateOfBirth = "1989-10-01T00:00:01.000Z",
+                            DriverLicenseNumber = "12345678",
+                            DriverLicenseState = "TX",
+                            SSN4 = "1210"
+                        }
+                    }
+                };
+
+                string json = JsonConvert.SerializeObject(recurringBilling);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }  
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+  "DeviceGuid" : "b29725af-b067-4a35-9819-bbb31bdf8808",
+  "Amount" : 10.50,
+  "Interval" : "monthly",
+  "IntervalValue" : "april, may, june",
+  "StartDate" : "2021-05-13",
+  "EndDate" : "2023-04-01",
+  "PaymentCount" : "",
+  "ScheduleNotes" : "Cable",
+  "Description" : "Description",
+  "Card":
+  {
+    "CardNumber" : "4556395004716019",
+    "CardHolderName" : "John Doe",
+    "Cvv2" : "999",
+    "ExpirationDate" : "2012",
+    "Customer":
+    {
+      "FirstName" : "John",
+      "LastName" : "Doe",
+      "Phone" : "9865123654",
+      "City" : "New York",
+      "State" : "NY",
+      "Country" : "US",
+      "Email" : "johndoe@mailinator.com",
+      "Address1" : "12th Ave. 5472",
+      "Address2" : "",
+      "Zip" : "10003",
+      "DateOfBirth" : "1989-10-01T00:00:01.000Z",
+      "DriverLicenseNumber" : "12345678",
+      "DriverLicenseState" : "TX",
+      "SSN4" : "1210"
+    }
+  }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "11fd2d0a-298f-4387-81ed-ffd6780f7a21",
+    "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+    "status": "RecurringBilling - Active",
+    "interval": "monthly",
+    "intervalValue": "april, may, june",
+    "amount": 10.50,
+    "recurringBillingNumber": "64942678",
+    "createdDate": "2020-11-25T08:31:38.6-06:00",
+    "startDate": "2021-05-13T00:00:00",
+    "endDate": "2023-04-01T00:00:00",
+    "scheduleNotes": "Cable",
+    "description": "Description",
+    "merchantProductListGuid": "00000000-0000-0000-0000-000000000000",
+    "invoiceGuid": "00000000-0000-0000-0000-000000000000",
+    "merchantProductListTotalAmount": 0.0,
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "pauseStartDate": null,
+    "pauseEndDate": null,
+    "processorStatusCode": "OK",
+    "processorResponseMessage": "Recurring billing scheduled. Payment count: 5. First payment: Thursday, May 13, 2021. Last payment: Monday, June 13, 2022",
+    "wasProcessed": true,
+    "card": {
+        "card.first6": "455639",
+        "card.last4": "6019",
+        "cardNumber": "7hEtLJIhooTE6019",
+        "cardHolderName": "John Doe",
+        "cardType": "Visa",
+        "expirationDate": "2020-12",
+        "customer": {
+            "guid": "3861f29b-2bb6-4ec0-8779-9efa1b3bb015",
+            "firstName": "John",
+            "lastName": "Doe",
+            "dateOfBirth": "1989-10-01T00:00:00",
+            "address1": "12th Ave. 5472",
+            "address2": "",
+            "zip": "10003",
+            "city": "New York",
+            "state": "NY",
+            "country": "US",
+            "phone": "9865123654",
+            "email": "johndoe@mailinator.com",
+            "ssN4": "1210",
+            "driverLicenseNumber": "12345678",
+            "driverLicenseState": "TX"
+        }
+    },
+    "scheduleAndPayments": [
+        {
+            "scheduledPaymentDate": "2021-05-13T00:00:00",
+            "scheduledPaymentDateDayOfWeek": "Thursday",
+            "scheduledPaymentNumber": 1,
+            "scheduledWasProcessed": false
+        },
+        {
+            "scheduledPaymentDate": "2021-06-13T00:00:00",
+            "scheduledPaymentDateDayOfWeek": "Sunday",
+            "scheduledPaymentNumber": 2,
+            "scheduledWasProcessed": false
+        },
+        {
+            "scheduledPaymentDate": "2022-04-13T00:00:00",
+            "scheduledPaymentDateDayOfWeek": "Wednesday",
+            "scheduledPaymentNumber": 3,
+            "scheduledWasProcessed": false
+        },
+        {
+            "scheduledPaymentDate": "2022-05-13T00:00:00",
+            "scheduledPaymentDateDayOfWeek": "Friday",
+            "scheduledPaymentNumber": 4,
+            "scheduledWasProcessed": false
+        },
+        {
+            "scheduledPaymentDate": "2022-06-13T00:00:00",
+            "scheduledPaymentDateDayOfWeek": "Monday",
+            "scheduledPaymentNumber": 5,
+            "scheduledWasProcessed": false
+        }
+    ]
+}
+```
+
+Recurring billing is a great feature you can use when you want to charge a card or debit from a bank account every a determined period of time. Period can be daily, weekly, biweekly, monthly, yearly, etc. Check the fields to know how to work with each of them.
+
+This endpoint creates a recurring billing.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/recurringBillings`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Optional | Device's Guid. Mandatory when providing a CreditCard or a BankAccount. Not required when providing an InvoiceGuid.
+InvoiceGuid | string | Optional | The Guid of the Invoice you want to make recurring. Do not send amount, nor Card neither Bank Account in this case.
+Amount | decimal | Optional | Transaction's amount. Min. amt.: $0.50. Mandatory when amount is fixed.
+Interval | string | Mandatory | Recurring billing interval. A customer can schedule the recurring payment at a desired interval.<br><br>Allowed values:<br><br>**1. yearly**<br>**2. halfYearly** <br>**3. quarterly** <br>**4. monthly** <br>**5. fortnightly** <br>**6. weekly** <br>**7. biweekly** <br>**8. daily** <br>**9. CustomDates** <br>**10. each1st** <br>**11. each15th** <br>**12. 1st15th**
+IntervalValue | string | Mandatory for monthly, weekly and custom dates modes| Allowed values:<br><br>**1**.For the **yearly**, **halfYearly** , **quarterly**, **fortnightly**, **biweekly**  and **daily** mode, does not need to enter **IntervalValue**, since they do not have.<br><br>**2**.For the **monthly** mode, select **everyMonth** or the months of the year. Example: "Interval" : "monthly", "IntervalValue" : "april, may, june".<br><br>**3**.For **weekly** mode, select **everyWeek** or the days of the week. Example: "Interval" : "weekly", "IntervalValue" : "monday, tuesday, wednesday".<br><br>**4**.For **CustomDates** mode, select a list of dates (yyyy-MM-dd) separated by commas. Example: "Interval" : "CustomDates", "IntervalValue" : "2017-03-12, 2017-04-06, 2017-05-17, 2017-06-12".
+SubIntervalValue | string | Mandatory for monthly | Allowed values:<br><br>**1**.Any day of the month.
+StartDate | date | Mandatory | The first payment date of the recurring billing schedule.<br><br>Allowed Recurring Billing format:<br><br>YYYY-MM-DD<br>For example: 2002-05-30
+EndDate | date | Mandatory when payment count is not submitted | The last payment date of the recurring billing schedule.<br><br>Allowed Recurring Billing format:<br><br>YYYY-MM-DD<br>For example: 2002-05-30<br><br>**Note: Send either EndDate or PaymentCount field in a request.**
+PaymentCount | integer | Mandatory when end date is not submitted | The count of payments in a recurring schedule payment, set by a customer.<br><br>**Note: Send either PaymentCount or EndDate field in a request.**
+ScheduleNotes | string | Optional | This field provides a place for the user to identify the reason they added or modified the recurring schedule.
+Description | string | Optional | General description about the recurring billing.
+DynamicAmount | boolean | Optional | Mandatory and true when providing a merchant product list guid. Not compatible with enhanced data.
+MerchantProductListGuid | string | Optional | MerchantProductList's Guid. Mandatory when providing a dynamic amount.
+SendReceipt | boolean | Optional | Set to “FALSE” if you do not want an e-mail receipt to be sent to the customer. Set to “TRUE” or leave empty if you want e-mail to be sent.
+EnhancedData | object | Optional | EnhancedData.
+ |  | 
+**EnhancedData** |  |
+SaleTax | decimal | Optional | Transaction's amount.
+AdditionalTaxDetailTaxCategory | string | Optional | Tax Category.
+AdditionalTaxDetailTaxType | string | Optional | Tax Type.
+AdditionalTaxDetailTaxAmount | decimal | Optional | Tax Amount.
+AdditionalTaxDetailTaxRate | decimal | Optional | Tax Rate.
+PurchaseOrder | string | Optional | Purchase Order.
+ShippingCharges | decimal | Optional | Shipping Charges.
+DutyCharges | decimal | Optional | Duty Charges.
+CustomerVATNumber | string | Optional | Customer VAT Number.
+VATInvoice | string | Optional | VAT Invoice.
+SummaryCommodityCode | string | Optional | Summary Commodity Code.
+ShipToZip | string | Optional | Ship To  Zip.
+ShipFromZip | string | Optional | Ship From Zip.
+DestinationCountryCode | string | Optional | Destination Country Code.
+SupplierReferenceNumber | string | Optional | Supplier Reference Number.
+CustomerRefID | string | Optional | Customer Ref ID.
+ChargeDescriptor | string | Optional | Charge Descriptor.
+AdditionalAmount | decimal | Optional | Additional Amount.
+AdditionalAmountType | string | Optional | Additional Amount Type.
+ProductName | string | Optional | Product Name.
+ProductCode | string | Optional | Product Code.
+Price | string | Optional | Price.
+MeasurementUnit | string | Optional | Measurement Unit.
+ |  | 
+**Card** |  |  | **Note: Send either Card or BankAccount object in a request.**
+CardNumber | string | Mandatory | Card number. Must be 16 characters.  (example: 4532538795426624) or token (example: FfL7exC7Xe2y6624).
+CardHolderName | string | Optional | Cardholder's name.
+Cvv2 | string | Optional | This is the three or four digit CVV code at the back side of the credit and debit card.
+ExpirationDate | date | Optional with Token | Card's expiry date in the YYMM format.
+Customer | object | Optional | Customer.
+ |  | 
+**BankAccount** |  |  | **Note: Send either BankAccount or Card object in a request.**
+RoutingNumber | string | Mandatory | Routing's number. Must be 9 characters (example: 490000018).
+AccountNumber | string | Mandatory | Account's number.
+NameOnAccount | string | Mandatory | Account's name.
+Customer | object | Optional | Customer.
+ |  | 
+**Customer** |  | 
+FirstName | string | Mandatory with bank account<br>Optional with credit card | Customer's first name.
+LastName | string | Mandatory with bank account<br>Optional with credit card | Customer's last name.
+Phone | string | Mandatory with bank account<br>Optional with credit card | Customer's phone number. The phone number must be syntactically correct. For example, 4152345678.
+City | string | Mandatory with bank account<br>Optional with credit card | Customer's city.
+State | string | Mandatory with bank account<br>Optional with credit card | Customer's short name state. The ISO 3166-2 CA and US state or province code of a customer. Length = 2.
+Country | string | Mandatory with bank account<br>Optional with credit card | Customer's country. The ISO country code of a customer’s country. Length = 2 or 3.
+Email | string | Mandatory with bank account<br>Optional with credit card | Customer's valid email address.
+Address1 | string | Mandatory with bank account<br>Optional with credit card | Customer's address.
+Address2 | string | Optional | Customer's address line 2.
+Zip | string | Mandatory with bank account<br>Optional with credit card | Customer's zipcode. Length = 5.
+DateOfBirth | date | With credit card: optional<br>With bank account: mandatory when SSN4 is not submitted | Customer's date of birth.<br><br>Allowed format:<br><br>YYYY-MM-DD.<br>For example: 2002-05-30
+DriverLicenseNumber | string | With credit card: optional<br>With bank account: optional | Customer's driver license number.
+DriverLicenseState | string | With credit card: optional<br>With bank account: mandatory when DriverLicenseNumber is provided | Customer's driver license short name state. The ISO 3166-2 CA and US state or province code of a customer. Length = 2.
+SSN4 | string | With credit card: optional<br>With bank account: mandatory when DOB is not submitted | Customer's social security number.
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+<aside class="success">
+You will get updates by e-mail regarding Recurring Billing status.
+</aside>
+
+## Update recurring billing
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class RecurringBilling
+    {
+        public static void UpdateRecurringBilling()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/recurringBillings/1de7a995-6e4d-4726-afb3-c9972b9b150a");
+                request.ContentType = "text/json";
+                request.Method = "PUT";
+
+                var recurringBilling = new
+                {
+                    Amount = 25.40,
+                    Interval = "monthly",
+                    IntervalValue = "january",
+                    StartDate = "2017-04-01T00:00:01.000Z",
+                    EndDate = "2018-06-01T00:00:01.000Z",
+                    PaymentCount = "",
+                    ScheduleNotes = "Cable",
+                    Description = "Description",
+                    Status = "RecurringBilling -  Active"
+                };
+
+                string json = JsonConvert.SerializeObject(recurringBilling);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+  "Amount" : 25.40,
+  "Interval" : "monthly",
+  "IntervalValue" : "january",
+  "StartDate" : "2017-04-01T00:00:01.000Z",
+  "EndDate" : "2018-06-01T00:00:01.000Z",
+  "PaymentCount" : "",
+  "ScheduleNotes" : "Cable",
+  "Description" : "Description",
+  "Status" : "RecurringBilling -  Active"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+  "guid": "1de7a995-6e4d-4726-afb3-c9972b9b150a",
+  "deviceGuid": "8257dde1-ded6-4c38-ab71-4338c4aa87ac",
+  "status": "RecurringBilling -  Active",
+  "interval": "monthly",
+  "intervalValue": "january",
+  "amount": 25.4,
+  "recurringBillingNumber": "99851606",
+  "startDate": "2017-04-01T00:00:01",
+  "endDate": "2018-06-01T00:00:01",
+  "scheduleNotes": "Cable",
+  "description" : "Description",
+  "processorStatusCode": "OK",
+  "processorResponseMessage": "Recurring billing re-scheduled. Payment count: 1. First payment: Monday, January 1, 2018. Last payment: Monday, January 1, 2018",
+  "wasProcessed": true,
+  "card": {
+    "card.first4": "4556",
+    "card.last4": "6019",
+    "cardNumber": "7hEtLJIhooTE6019",
+    "cardHolderName": "John Doe",
+    "expirationDate": "2017-10",
+    "customer": {
+      "guid": "d0912636-4fc1-48a4-b002-aa39a9df1288",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phone": "9865123654",
+      "city": "New York",
+      "country": "US",
+      "email": "johndoe@mailinator.com",
+      "zip": "10003",
+      "address1": "12th Ave. 5472",
+      "address2": "",
+      "state": "NY",
+      "dateOfBirth": "1989-10-01T00:00:00",
+      "DriverLicenseNumber" : "12345678",
+      "DriverLicenseState" : "TX",
+      "SSN4" : "1210"
+    }
+  },
+  "scheduleAndPayments": [
+    {
+      "scheduledPaymentDate": "2018-01-01T00:00:00",
+      "scheduledPaymentDateDayOfWeek": "Monday",
+      "scheduledPaymentNumber": 1,
+      "scheduledWasProcessed": false
+    }
+  ]
+}
+```
+
+This endpoint updates a recurring billing.
+
+### HTTP Request
+
+`PUT https://sandbox.choice.dev/api/v1/recurringBillings<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Recurring billings’s guid to update
+
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+Amount | decimal | Optional | Transaction's amount. Min. amt.: $0.50
+Interval | string | Optional | Recurring billing interval. A customer can schedule the recurring payment at a desired interval.<br><br>Allowed values:<br><br>**1. yearly**<br>**2. halfYearly** <br>**3. quarterly** <br>**4. monthly** <br>**5. fortnightly** <br>**6. weekly** <br>**7. biweekly** <br>**8. daily** <br>**9. CustomDates** <br>**10. each1st** <br>**11. each15th** <br>**12. 1st15th**
+IntervalValue | string | Optional | Allowed values:<br><br>**1**.For the **yearly**, **halfYearly** , **quarterly**, **fortnightly**, **biweekly**  and **daily** mode, does not need to enter **IntervalValue**, since they do not have.<br><br>**2**.For the **monthly** mode, select **everyMonth** or the months of the year. Example: "Interval" : "monthly", "IntervalValue" : "april, may, june".<br><br>**3**.For **weekly** mode, select **everyWeek** or the days of the week. Example: "Interval" : "weekly", "IntervalValue" : "monday, tuesday, wednesday".<br><br>**4**.For **CustomDates** mode, select a list of dates (yyyy-MM-dd) separated by commas. Example: "Interval" : "CustomDates", "IntervalValue" : "2017-03-12, 2017-04-06, 2017-05-17, 2017-06-12".
+SubIntervalValue | string | Mandatory for monthly | Allowed values:<br><br>**1**.Any day of the month.
+StartDate | date | Optional | The first payment date of the recurring billing schedule.<br><br>Allowed Recurring Billing format:<br><br>YYYY-MM-DD<br>For example: 2002-05-30
+EndDate | date | Optional | The first payment date of the recurring billing schedule.<br><br>Allowed Recurring Billing format:<br><br>YYYY-MM-DD<br>For example: 2002-05-30<br><br>**Note: Send either EndDate or PaymentCount field in a request.**
+PaymentCount | integer | Optional | The count of payments in a recurring schedule payment, set by a customer.<br><br>**Note: Send either PaymentCount or EndDate field in a request.**
+ScheduleNotes | string | Optional | This field provides a place for the user to identify the reason they added or modified the recurring schedule.
+Description | string | Optional | General description about the recurring billing.
+SendReceipt | boolean | Optional | Set to “FALSE” if you do not want an e-mail receipt to be sent to the customer. Set to “TRUE” or leave empty if you want e-mail to be sent.
+Status | string | Optional | Recurring billing status.<br><br>Allowed values:<br><br>**1. RecurringBilling -  Active**<br>**2. RecurringBilling - Created - Local** <br>**3. RecurringBilling - Created - Error: Processor not reached** <br>**4. RecurringBilling - Created - Processor Fail** <br>**5. RecurringBilling -  Deactivated** <br>**6. RecurringBilling -  Paused** <br>**7. RecurringBilling - Finished** <br>**8. RecurringBilling - Deleted** <br>**9. RecurringBilling - Active Started**
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Get recurring billing
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class RecurringBilling
+    {
+        public static void GetRecurringBilling()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/recurringBillings/1de7a995-6e4d-4726-afb3-c9972b9b150a");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+  "guid": "d1507904-f84c-4508-98ef-5f0fcc417019",
+  "deviceGuid": "75f97793-430b-4e94-9aec-383950639b18",
+  "status": "RecurringBilling -  Active",
+  "interval": "monthly",
+  "intervalValue": "april, may, june",
+  "amount": 10.5,
+  "recurringBillingNumber": "14339150",
+  "startDate": "2017-05-13T00:00:00",
+  "endDate": "2019-04-01T00:00:00",
+  "scheduleNotes": "Cable",
+  "description": "Description",
+  "processorStatusCode": "OK",
+  "processorResponseMessage": "Recurring billing scheduled. Payment count: 5. First payment: Saturday, May 13, 2017. Last payment: Wednesday, June 13, 2018",
+  "wasProcessed": true,
+  "card": {
+    "card.first6": "124556",
+    "card.last4": "6019",
+    "cardNumber": "7hEtLJIhooTE6019",
+    "cardHolderName": "John Doe",
+    "expirationDate": "2017-10",
+    "customer": {
+      "guid": "d0912636-4fc1-48a4-b002-aa39a9df1288",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phone": "9865123654",
+      "city": "New York",
+      "country": "US",
+      "email": "johndoe@mailinator.com",
+      "zip": "10003",
+      "address1": "12th Ave. 5472",
+      "address2": "",
+      "state": "NY",
+      "dateOfBirth": "1989-10-01T00:00:00",
+      "DriverLicenseNumber" : "12345678",
+      "DriverLicenseState" : "TX",
+      "SSN4" : "1210"
+    }
+  },
+  "scheduleAndPayments": [
+    {
+      "scheduledPaymentDate": "2017-05-13T00:00:00",
+      "scheduledPaymentDateDayOfWeek": "Saturday",
+      "scheduledPaymentNumber": 1,
+      "scheduledWasProcessed": false
+    },
+    {
+      "scheduledPaymentDate": "2017-06-13T00:00:00",
+      "scheduledPaymentDateDayOfWeek": "Tuesday",
+      "scheduledPaymentNumber": 2,
+      "scheduledWasProcessed": false
+    },
+    {
+      "scheduledPaymentDate": "2018-04-13T00:00:00",
+      "scheduledPaymentDateDayOfWeek": "Friday",
+      "scheduledPaymentNumber": 3,
+      "scheduledWasProcessed": false
+    },
+    {
+      "scheduledPaymentDate": "2018-05-13T00:00:00",
+      "scheduledPaymentDateDayOfWeek": "Sunday",
+      "scheduledPaymentNumber": 4,
+      "scheduledWasProcessed": false
+    },
+    {
+      "scheduledPaymentDate": "2018-06-13T00:00:00",
+      "scheduledPaymentDateDayOfWeek": "Wednesday",
+      "scheduledPaymentNumber": 5,
+      "scheduledWasProcessed": false
+    }
+  ]
+}
+```
+
+This endpoint gets a recurring billing.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/recurringBillings/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Recurring billings’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+# Batch
+
+## Close batch
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Batch
+    {
+        public static void CloseBatch()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Batches/close");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var batch = new
+                {
+                    DeviceGuid = "8257dde1-ded6-4c38-ab71-4338c4aa87ac"
+                };
+
+                string json = JsonConvert.SerializeObject(batch);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+  "DeviceGuid" : "b29725af-b067-4a35-9819-bbb31bdf8808"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+    "guid": "58e8a0ad-d167-4015-a4b1-904b1e7f2b26",
+    "status": "PASS",
+    "responseCode": "A0000",
+    "responseMessage": "Success",
+    "closureDate": "2020-11-25T14:39:56.2262428Z",
+    "batchInfo": {
+        "batchNumber": "160635",
+        "saleCount": 2,
+        "saleAmount": 46.53,
+        "returnCount": 1,
+        "returnAmount": 19.74,
+        "batchNetAmount": 26.79
+    }
+}
+```
+
+Batch is processing all the authorized transactions of the day at the end of the day. However, you can close a batch manually before. You can also get your transactions searched by batch.
+
+This endpoint closes a batch.
+
+<aside class="warning">
+<strong style="font-size: 130%;">Batch closing is mandatory, otherwise transactions are not settled.</strong>
+</aside>
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Batches/close`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device’s Guid.
+SemiIntegrated | boolean | Optional | Only when physical terminal used on semi integrated mode, send value True.
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Search batches
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Batch
+    {
+        public static void SearchBatch()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Batches/search");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var batch = new
+                {
+                    deviceGuid = "58ccf5a4-1d5d-4546-8202-da5c7ad10711",
+                    startDate = "1/1/1900",
+                    endDate = "12/31/2020"
+                };
+
+                string json = JsonConvert.SerializeObject(batch);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }  
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+  "deviceGuid" : "58ccf5a4-1d5d-4546-8202-da5c7ad10711",
+  "startDate" : "1/1/1900",
+  "endDate" : "12/31/2020"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "count": 2,
+    "ret": [
+        {
+            "batchGuid": "58e8a0ad-d167-4015-a4b1-904b1e7f2b26",
+            "batchNumber": "160635",
+            "closureDate": "2020-11-25T08:39:56.86-06:00",
+            "batchTotalAmount": 26.79,
+            "userName": "maxduplessy",
+            "summary": {
+                "saleCount": 2,
+                "saleAmount": 46.53,
+                "returnCount": 1,
+                "returnAmount": 19.74
+            },
+            "transactions": [
+                {
+                    "transactionType": "Return",
+                    "transactionDatetime": "2020-11-23T07:17:24.15-06:00",
+                    "lastFour": "0213",
+                    "cardType": "Mastercard",
+                    "amount": 19.74,
+                    "processorResponseMessage": "Return requested, Void successful", 
+                    "deviceGuid": "9f8fa757-d607-4ba8-a26a-f6e7ae4a94af", 
+                    "generatedByRecurringBilling": false, 
+                    "orderNumber": "AC4a7DG",
+                    "orderDate": "2017-02-03T00:00:00",
+                    "invoiceNumber": "Ref46g6", 
+                    "processorResponseCode": "A0000",
+                    "processorAuthCode": "TAS0243",
+                    "processorRefNumber": "85040041",
+                    "softDescriptor": "1", 
+                    "tipAmount": 3.000,
+                    "serviceFee": 0.40,
+                    "surchargeAmount": 0.35,
+                    "surchargeLabel": "4 Percent",
+                    "cvvVerificationCode": "M",
+                    "addressVerificationCode": "N",
+                    "invoiceGuid": "4f8fa757-d617-4ba8-f56a-f6e7ae4a94jg", 
+                    "currencyCode": "USD",
+                    "semiIntegrated": false, 
+                    "cardDataSource": "INTERNET",
+                    "generatedByCapture": false,        
+                    "salesTax": 0.1, 
+                    "shippingCharges": 0.12, 
+                    "CustomerRefID": "Ref937"
+                },
+                {
+                    "transactionType": "Sale",
+                    "transactionDatetime": "2020-11-28T07:29:06.97-06:00",
+                    "lastFour": "8442",
+                    "cardType": "Visa",
+                    "amount": 25.04,
+                    "processorResponseMessage": "Success", 
+                    "deviceGuid": "9f8fa757-d607-4ba8-a56a-f6e7ae4a94af", 
+                    "generatedByRecurringBilling": false, 
+                    "orderNumber": "AC47DQG",
+                    "orderDate": "2017-02-03T00:00:00",
+                    "invoiceNumber": "Ref4668", 
+                    "processorResponseCode": "A0000",
+                    "processorAuthCode": "TAS0244",
+                    "processorRefNumber": "85040012",
+                    "softDescriptor": "1", 
+                    "tipAmount": 3.000,
+                    "serviceFee": 0.40,
+                    "surchargeAmount": 0.35,
+                    "surchargeLabel": "4 Percent",
+                    "cvvVerificationCode": "M",
+                    "addressVerificationCode": "N",
+                    "invoiceGuid": "4f8fa757-d607-4ba8-f56a-f6e7ae4a9fjg", 
+                    "currencyCode": "USD",
+                    "semiIntegrated": false, 
+                    "cardDataSource": "INTERNET",
+                    "generatedByCapture": false,        
+                    "salesTax": 0.1, 
+                    "shippingCharges": 0.12, 
+                    "CustomerRefID": "Ref9977"
+                },
+                {
+                    "transactionType": "Sale",
+                    "transactionDatetime": "2020-11-29T07:30:52.72-06:00",
+                    "lastFour": "0213",
+                    "cardType": "Mastercard",
+                    "amount": 21.49,
+                    "processorResponseMessage": "Success", 
+                    "deviceGuid": "9f8fa757-d607-4ba8-a56a-f6e7aw4a94af", 
+                    "generatedByRecurringBilling": false, 
+                    "orderNumber": "ACL47DG",
+                    "orderDate": "2017-02-08T00:00:00",
+                    "invoiceNumber": "Ref4166", 
+                    "processorResponseCode": "A0000",
+                    "processorAuthCode": "TAS0424",
+                    "processorRefNumber": "85042001",
+                    "softDescriptor": "1", 
+                    "tipAmount": 3.000,
+                    "serviceFee": 0.40,
+                    "surchargeAmount": 0.35,
+                    "surchargeLabel": "4 Percent",
+                    "cvvVerificationCode": "M",
+                    "addressVerificationCode": "N",
+                    "invoiceGuid": "4f8fa757-d607-4ba8-fw6a-f6e7ae4a94jg", 
+                    "currencyCode": "USD",
+                    "semiIntegrated": false, 
+                    "cardDataSource": "INTERNET",
+                    "generatedByCapture": false,        
+                    "salesTax": 0.1, 
+                    "shippingCharges": 0.12, 
+                    "CustomerRefID": "Ref4997"
+                }
+            ]
+        },
+        {
+            "batchGuid": "b8d73296-e397-45c0-bb43-ba064e9750ac",
+            "batchNumber": "160634",
+            "closureDate": "2020-11-25T07:16:27.09-06:00",
+            "batchTotalAmount": 19.74,
+            "userName": "maxduplessy",
+            "summary": {
+                "saleCount": 1,
+                "saleAmount": 19.74,
+                "returnCount": 0,
+                "returnAmount": 0.00
+            },
+            "transactions": [
+                {
+                    "transactionType": "Sale",
+                    "transactionDatetime": "2020-11-15T07:15:27.28-06:00",
+                    "lastFour": "0213",
+                    "cardType": "Mastercard",
+                    "amount": 19.74,
+                    "processorResponseMessage": "Success", 
+                    "deviceGuid": "9f8fa757-d607-4ba8-a54a-f6e7ae4a94af", 
+                    "generatedByRecurringBilling": false, 
+                    "orderNumber": "AC47DG",
+                    "orderDate": "2017-07-03T00:00:00",
+                    "invoiceNumber": "Ref4696", 
+                    "processorResponseCode": "A0000",
+                    "processorAuthCode": "TAS02497",
+                    "processorRefNumber": "850400196",
+                    "softDescriptor": "1", 
+                    "tipAmount": 3.000,
+                    "serviceFee": 0.40,
+                    "surchargeAmount": 0.35,
+                    "surchargeLabel": "4 Percent",
+                    "cvvVerificationCode": "M",
+                    "addressVerificationCode": "N",
+                    "invoiceGuid": "4f8fa757-d607-4ba8-f56a-f6e75e4a94jg", 
+                    "currencyCode": "USD",
+                    "semiIntegrated": false, 
+                    "cardDataSource": "INTERNET",
+                    "generatedByCapture": false,        
+                    "salesTax": 0.1, 
+                    "shippingCharges": 0.12, 
+                    "CustomerRefID": "Ref99760"
+                }
+            ]
+        }
+    ]
+}
+```
+
+This endpoint searches batches in a date range.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Batches/search`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+deviceGuid | string | Mandatory | Device's guid.
+startDate | date | Mandatory | Search's start date.<br><br>Allowed Recurring Billing format:<br><br>YYYY-MM-DD<br>For example: 2002-05-30
+endDate | date | Mandatory | Search's end date.<br><br>Allowed Recurring Billing format:<br><br>YYYY-MM-DD<br>For example: 2002-05-30
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Get batches with transactions
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Batch
+    {
+        public static void GetBatchsWithTransactions()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Batches/58e8a0ad-d167-4015-a4b1-904b1e7f2b26/Transactions");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+[
+    {
+        "transactionType": "Return",
+        "transactionDatetime": "2020-11-25T07:17:24.15-06:00",
+        "lastFour": "0213",
+        "cardType": "Mastercard",
+        "amount": 19.74,
+        "processorResponseMessage": "Return requested, Void successful",
+        "userName": "maxduplessy", 
+        "deviceGuid": "9f8fa757-d607-4ba8-a56a-f6e7ae4a94af", 
+        "generatedByRecurringBilling": false, 
+        "orderNumber": "AC47DjG",
+        "orderDate": "2017-02-03T00:00:00",
+        "invoiceNumber": "Ref466", 
+        "processorResponseCode": "A0000",
+        "processorAuthCode": "TAS024",
+        "processorRefNumber": "8504001",
+        "softDescriptor": "1", 
+        "tipAmount": 3.000,
+        "serviceFee": 0.40,
+        "surchargeAmount": 0.35,
+        "surchargeLabel": "4 Percent",
+        "cvvVerificationCode": "M",
+        "addressVerificationCode": "N",
+        "invoiceGuid": "4f8fa757-d607-4ba8-f56a-f6e7ae4a94jg", 
+        "currencyCode": "USD",
+        "semiIntegrated": false, 
+        "cardDataSource": "INTERNET",
+        "generatedByCapture": false,        
+        "salesTax": 0.1, 
+        "shippingCharges": 0.12, 
+        "CustomerRefID": "Ref99H7"
+    },
+    {
+        "transactionType": "Sale",
+        "transactionDatetime": "2020-11-25T07:29:06.97-06:00",
+        "lastFour": "8442",
+        "cardType": "Visa",
+        "amount": 25.04,
+        "processorResponseMessage": "Success",
+        "userName": "maxduplessy", 
+        "deviceGuid": "9f8fa757-d607-4ba8-a56a-f6e7ae4a94af", 
+        "generatedByRecurringBilling": false, 
+        "orderNumber": "AC47PDG",
+        "orderDate": "2017-02-03T00:00:00",
+        "invoiceNumber": "Ref466", 
+        "processorResponseCode": "A0000",
+        "processorAuthCode": "TAS024",
+        "processorRefNumber": "8504001",
+        "softDescriptor": "1", 
+        "tipAmount": 3.000,
+        "serviceFee": 0.40,
+        "surchargeAmount": 0.35,
+        "surchargeLabel": "4 Percent",
+        "cvvVerificationCode": "M",
+        "addressVerificationCode": "N",
+        "invoiceGuid": "9f8fa757-d607-4ba8-f56a-f6e7ae4a94af", 
+        "currencyCode": "USD",
+        "semiIntegrated": false, 
+        "cardDataSource": "INTERNET",
+        "generatedByCapture": false,        
+        "salesTax": 0.1, 
+        "shippingCharges": 0.12, 
+        "CustomerRefID": "Ref997"
+    },
+    {
+        "transactionType": "Sale",
+        "transactionDatetime": "2020-11-25T07:30:52.72-06:00",
+        "lastFour": "0213",
+        "cardType": "Mastercard",
+        "amount": 21.49,
+        "processorResponseMessage": "Success",
+        "userName": "maxduplessy", 
+        "deviceGuid": "9f8fa757-d607-4ba8-a56a-f6e7ae4a94af", 
+        "generatedByRecurringBilling": false, 
+        "orderNumber": "AC47Dj",
+        "orderDate": "2017-02-09T00:00:00",
+        "invoiceNumber": "Ref456", 
+        "processorResponseCode": "A0000",
+        "processorAuthCode": "TAS24",
+        "processorRefNumber": "854401",
+        "softDescriptor": "1", 
+        "tipAmount": 3.000,
+        "serviceFee": 0.40,
+        "surchargeAmount": 0.35,
+        "surchargeLabel": "4 Percent",
+        "cvvVerificationCode": "M",
+        "addressVerificationCode": "N",
+        "invoiceGuid": "9f8fa757-d607-4ba8-f56a-f6e7ae4a94af", 
+        "currencyCode": "USD",
+        "semiIntegrated": false, 
+        "cardDataSource": "INTERNET",
+        "generatedByCapture": false,        
+        "salesTax": 0.1, 
+        "shippingCharges": 0.12, 
+        "CustomerRefID": "Ref78997"
+    }
+]
+```
+
+This endpoint gets a batch with its transactions.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/Batches/<guid>/Transactions/`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Batch’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+# Invoice Customer
+
+## Create invoice customer
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceCustomer
+    {
+        public static void CreateInvoiceCustomer()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/InvoiceCustomers");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var invoiceCustomer = new
+                {
+                    MerchantGuid = "24639b5f-f881-45dc-966c-4beece954e6c",
+                    CompanyName = "Incutex",
+                    FirstName = "John",
+                    LastName = "Lock",
+                    Address1 = "108 8th Av.",
+                    Address2 = "8th Floor",
+                    Zip = "10008",
+                    City = "New York",
+                    State = "NY",
+                    PersonalPhone = "9727414574",
+                    WorkPhone = "9177563046",
+                    Fax = "8004578796",
+                    Email = "john.lock@mailinator.com"
+                };
+
+                string json = JsonConvert.SerializeObject(invoiceCustomer);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+	"MerchantGuid" : "24639b5f-f881-45dc-966c-4beece954e6c",
+	"CompanyName" : "Incutex",
+	"FirstName": "John",
+	"LastName": "Lock",
+	"Address1": "108 8th Av.",
+	"Address2": "8th Floor",
+	"Zip": "10008",
+	"City": "New York",
+	"State": "NY",
+	"PersonalPhone" : "9727414574",
+	"WorkPhone" : "9177563046",
+	"Fax" : "8004578796",
+	"Email": "john.lock@mailinator.com"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "33524364-727a-422b-8bbe-5eab1a849e82",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "customerCode": "LJ7482",
+    "companyName": "Incutex",
+    "firstName": "John",
+    "lastName": "Lock",
+    "address1": "108 8th Av.",
+    "address2": "8th Floor",
+    "zip": "10008",
+    "city": "New York",
+    "state": "NY",
+    "personalPhone": "9727414574",
+    "workPhone": "9177563046",
+    "fax": "8004578796",
+    "email": "john.lock@mailinator.com",
+    "invoiceNumber": "000001"
+}
+```
+
+This endpoint creates a invoice customer.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/InvoiceCustomers`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant’s Guid.
+CompanyName | string | Optional | Company Name.
+FirstName | string |  Optional | User’s first name.
+LastName | string | Optional | User’s last name.
+Address1 | string | Optional | User’s address.
+Address2 | string | Optional | User’s address line 2.
+City | string | Optional | User’s city.
+State | string | Optional | User’s short name state. The ISO 3166-2 CA and US state or province code of a user. Length = 2.
+Zip | string | Optional | User’s zipcode. Length = 5.
+PersonalPhone | string | Optional | User’s phone number. The phone number must be syntactically correct. For example, 4152345678.
+WorkPhone | string | Optional | User’s phone number. The phone number must be syntactically correct. For example, 4152345678.
+Fax | string | Optional | User’s phone number. The phone number must be syntactically correct. For example, 4152345678.
+Email | string | Optional | User’s valid email address
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Update invoice customer
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceCustomer
+    {
+        public static void UpdateInvoiceCustomer()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/InvoiceCustomers/33524364-727a-422b-8bbe-5eab1a849e82");
+                request.ContentType = "text/json";
+                request.Method = "PUT";
+
+                var invoiceCustomer = new
+                {
+                    CompanyName = "Incutex",
+                    FirstName = "John",
+                    LastName = "Lock",
+                    Address1 = "108 8th Av.",
+                    Address2 = "8th Floor",
+                    Zip = "10008",
+                    City = "New York",
+                    State = "NY",
+                    PersonalPhone = "9727414574",
+                    WorkPhone = "9177563046",
+                    Fax = "8004578796",
+                    Email = "john.lock@mailinator.com"
+                };
+
+                string json = JsonConvert.SerializeObject(invoiceCustomer);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+  "CompanyName" : "Incutex",
+  "FirstName": "John",
+  "LastName": "Lock",
+  "Address1": "108 8th Av.",
+  "Address2": "8th Floor",
+  "Zip": "10008",
+  "City": "New York",
+  "State": "NY",
+  "PersonalPhone" : "9727414574",
+  "WorkPhone" : "9177563046",
+  "Fax" : "8004578796",
+  "Email": "john.lock@mailinator.com"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "33524364-727a-422b-8bbe-5eab1a849e82",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "customerCode": "LJ7482",
+    "companyName": "Incutex",
+    "firstName": "John",
+    "lastName": "Lock",
+    "address1": "108 8th Av.",
+    "address2": "8th Floor",
+    "zip": "10008",
+    "city": "New York",
+    "state": "NY",
+    "personalPhone": "9727414574",
+    "workPhone": "9177563046",
+    "fax": "8004578796",
+    "email": "john.lock@mailinator.com",
+    "invoiceNumber": "000001"
+}
+```
+
+This endpoint updates a invoice customer.
+
+### HTTP Request
+
+`PUT https://sandbox.choice.dev/api/v1/InvoiceCustomers/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Invoice customer’s guid to update
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+CompanyName | string | Optional | Company Name.
+FirstName | string |  Optional | User’s first name.
+LastName | string | Optional | User’s last name.
+Address1 | string | Optional | User’s address.
+Address2 | string | Optional | User’s address line 2.
+City | string | Optional | User’s city.
+State | string | Optional | User’s short name state. The ISO 3166-2 CA and US state or province code of a user. Length = 2.
+Zip | string | Optional | User’s zipcode. Length = 5.
+PersonalPhone | string | Optional | User’s phone number. The phone number must be syntactically correct. For example, 4152345678.
+WorkPhone | string | Optional | User’s phone number. The phone number must be syntactically correct. For example, 4152345678.
+Fax | string | Optional | User’s phone number. The phone number must be syntactically correct. For example, 4152345678.
+Email | string | Optional | User’s valid email address
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+## Get invoice customer
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceCustomer
+    {
+        public static void GetInvoiceCustomer()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/InvoiceCustomers/33524364-727a-422b-8bbe-5eab1a849e82");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "33524364-727a-422b-8bbe-5eab1a849e82",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "customerCode": "LJ7482",
+    "companyName": "Incutex",
+    "firstName": "John",
+    "lastName": "Lock",
+    "address1": "108 8th Av.",
+    "address2": "8th Floor",
+    "zip": "10008",
+    "city": "New York",
+    "state": "NY",
+    "personalPhone": "9727414574",
+    "workPhone": "9177563046",
+    "fax": "8004578796",
+    "email": "john.lock@mailinator.com",
+    "invoiceNumber": "000001"
+}
+```
+
+This endpoint gets a invoice customer.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/InvoiceCustomers/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Invoice customer’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Get invoice customer by Merchant
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceCustomer
+    {
+        public static void GetInvoiceCustomerByMerchant()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/24639b5f-f881-45dc-966c-4beece954e6c/InvoiceCustomers");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+[
+    {
+        "guid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+        "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "customerCode": "NA1530",
+        "companyName": "Incutex",
+        "firstName": "Max",
+        "lastName": "Tomassi",
+        "address1": "Belgrano 383",
+        "zip": "10016",
+        "city": "New York",
+        "state": "NY",
+        "country": "United States",
+        "province": "",
+        "personalPhone": "",
+        "email": "maxduplessy@mailinator.com",
+        "invoiceNumber": "000001",
+        "shippingAddresses": [
+            {
+                "isDeleted": false,
+                "guid": "e45e0464-39c8-4d87-b1da-7bef8b251f29",
+                "address1": "Belgrano 383",
+                "zip": "10016",
+                "city": "New York",
+                "state": "NY",
+                "country": "United States",
+                "province": ""
+            }
+        ]
+    },
+    {
+        "guid": "e79ec8b0-dbd3-4be0-bf4e-8c12c632be7c",
+        "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "customerCode": "TD1627",
+        "companyName": "Incutex",
+        "firstName": "John",
+        "lastName": "Lock",
+        "address1": "108 8th Av.",
+        "address2": "8th Floor",
+        "zip": "10008",
+        "city": "New York",
+        "state": "NY",
+        "personalPhone": "9727414574",
+        "workPhone": "9177563046",
+        "fax": "8004578796",
+        "email": "john.lock@mailinator.com",
+        "invoiceNumber": "000001"
+    },
+    {
+        "guid": "33524364-727a-422b-8bbe-5eab1a849e82",
+        "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "customerCode": "LJ7482",
+        "companyName": "Incutex",
+        "firstName": "John",
+        "lastName": "Lock",
+        "address1": "108 8th Av.",
+        "address2": "8th Floor",
+        "zip": "10008",
+        "city": "New York",
+        "state": "NY",
+        "personalPhone": "9727414574",
+        "workPhone": "9177563046",
+        "fax": "8004578796",
+        "email": "john.lock@mailinator.com",
+        "invoiceNumber": "000001"
+    }
+]
+```
+
+This endpoint gets a invoice customer.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/Invoice/<merchantGuid>/InvoiceCustomers`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+merchantGuid | Merchant’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
