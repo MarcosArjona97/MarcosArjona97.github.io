@@ -13062,3 +13062,1158 @@ Remember you will need to use an authentication token or the API Key in the head
 </aside>
 
 
+
+# Hosted Payment Page
+
+## Hosted Payment Page
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Account
+    {
+        public static void HostedPaymentPage()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/HostedPaymentPageRequests");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var payment = new
+                {
+                    DeviceCreditCardGuid = "4b5013f7-b275-4929-8e83-0167c6edf639",
+                    DeviceAchGuid = "386ac1e6-250d-4866-b283-248c1e9340ef",
+                    Merchantname = "StarCoffe",
+                    Description = "coffe latte",
+                    Amount = 7.50,
+                    OtherURL = "http://StarCoffe/other",
+                    SuccessURL = "http://StarCoffe/success",
+                    CancelURL = "http://StarCoffe/cancel"
+                    OtherInfo = "Energy tax",
+                    Customer = new
+                    {
+                        FirstName = "Max",
+                        LastName = "Tomassi",
+                        Phone = "8741234745",
+                        City = "New York",
+                        State = "NY",
+                        Email = "maxduplessy@mailinator.com",
+                        Address1 = "110 10th Av.",
+                        Address2 = "",
+                        Zip = "10016"
+                    }
+                };
+
+                string json = JsonConvert.SerializeObject(payment);
+
+                request.Headers.Add("Authorization", "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6EBqB7RFjVMuhmuPNWcYM7ozyMb3uaDe0gyDL_nMPESbuM5I4skBOYcUM4A06NO88CVV3yBYee7mWB1qT-YFu5A3KZJSfRIbTX9GZdrZpi-JuWsx-7GE9GIYrNJ29BpaQscTwxYDr67WiFlCCrsCqWnCPJUjCFRIrTDltz8vM15mlgjiO0y04ZACGOWNNErIVegX062oydV7SqumGJEbS9Av4gdy");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }  
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "DeviceCreditCardGuid": "4b5013f7-b275-4929-8e83-0167c6edf639",
+    "DeviceAchGuid": "386ac1e6-250d-4866-b283-248c1e9340ef",
+    "Merchantname": "StarCoffe",
+    "Description": "coffe latte",
+    "Amount": 7.50,
+    "OtherURL": "http://StarCoffe/other",
+    "SuccessURL": "http://StarCoffe/success",
+    "CancelURL": "http://StarCoffe/cancel",
+    "OtherInfo": "Energy tax",
+    "Customer": {
+        "FirstName": "Max",
+        "LastName": "Tomassi",
+        "Phone": "8741234745",
+        "City": "New York",
+        "State": "NY",
+        "Email": "maxduplessy@mailinator.com",
+        "Address1": "110 10th Av.",
+        "Address2": "",
+        "Zip": "10016"
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "merchantname": "StarCoffe",
+    "description": "coffe latte",
+    "amount": 7.50,
+    "otherURL": "http://StarCoffe/other",
+    "successURL": "http://StarCoffe/success",
+    "cancelURL": "http://StarCoffe/cancel",
+    "tempToken": "69337810-182e-4afe-a9d9-7268def789c7",
+    "expiration": "2120-11-26T15:01:06.75",
+    "otherInfo": "Energy tax",
+    "customer": {
+        "guid": "8144d441-acf2-4549-98cb-bab762675423",
+        "firstName": "Max",
+        "lastName": "Tomassi",
+        "address1": "110 10th Av.",
+        "address2": "",
+        "zip": "10016",
+        "city": "New York",
+        "state": "NY",
+        "phone": "8741234745",
+        "email": "maxduplessy@mailinator.com"
+    }
+}
+```
+
+> **If the transaction gets approved the user will be redirected back to your site, sending a POST to the SuccessURL with the following parameters.**
+
+```json
+{
+ "PaymentType": "Credit Card",
+ "SaleGuid": "fa101801-1b87-495d-87b9-aeae745e9c85",
+ "TokenizedCard": "84yXtM3EcGze0103",
+ "OtherInfo": "",
+ "Status": "Success",
+ "AccountNumberLastFour": "1234",
+ "Receipt": "CHOICE MERCHANT SOLUTIONS<br/>8320 S HARDY DRIVE<br/>TEMPE AZ 85284<br/>07/07/2017 07:23:55<br/><br/>CREDIT - SALE<br/><br/>CARD # : **** **** **** 0103<br/>CARD TYPE : VISA<br/>Entry Mode : MANUAL<br/><br/>REF # : 13259222<br/>Invoice number : 13259222<br/>AUTH CODE : TAS869<br/>Subtotal:                       $13.50<br/>--------------------------------------<br/>Total:                          $13.50<br/>--------------------------------------<br/>Andres Ordonez<br/><br/>CUSTOMER ACKNOWLEDGES RECEIPT OF<br/>GOODS AND/OR SERVICES IN THE AMOUNT<br/>OF THE TOTAL SHOWN HEREON AND AGREES<br/>TO PERFORM THE OBLIGATIONS SET FORTH<br/>BY THE CUSTOMER`S AGREEMENT WITH THE<br/>ISSUER<br/>APPROVED<br/>Customer Copy<br/>"
+}
+```
+
+> **If the transaction goes wrong the user will be redirected back to your site, sending a POST to OtherURL with the following parameters**
+
+```json
+{
+ "Error": "The Sale could not be processed correctly. Error code D2020. Error message: CVV2 verification failed"
+}
+```
+
+
+
+The hosted payment page feature allows online and small merchants to redirect via a checkout button at their website visitors who wish to purchase items, pay invoices or make any type or transaction credit or ACH (if enabled).
+
+To do this, simply POST to the following address using the following parameters and get your temporal token back. Then GET to our Hosted Payment Page using that temporal token and we care about the rest. This streamlines the checkout process and helps protect shoppers’ sensitive payment account data.
+
+Enjoy a seamless checkout experience that automatically routes them to a secure page, branded with your company name. The customer enters their payment data directly into our server, releasing you of the responsibility of receiving, storing and transmitting sensitive cardholder data.
+
+### HTTP POST
+
+`POST https://sandbox.choice.dev/api/v1/HostedPaymentPageRequests`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type | M/C/O | Value
+--------- | ------- | ------- | -----------
+DeviceCreditCardGuid | string | Mandatory | Device's guid Credit Card.
+DeviceAchGuid | string | Mandatory | Device's guid Ach.
+Merchantname | string | Mandatory | Merchant's name.
+Description | string | Mandatory | Items description.
+Amount | string | Mandatory | Items total amount.
+OtherURL | string | Mandatory | Web page you want to redirect the user in case something failed.
+SuccessURL | string | Mandatory | Web page you want to redirect the user when transaction was successful.
+CancelURL | string | Mandatory | Web page you want to redirect the user in case he decided to cancel the transaction.
+OtherInfo | string | optional | Any alphanumeric code you might want to send to see it on the confirmation's response to keep track of your sales.
+IsButton | boolean | optional | Determines if the hosted payment page request will be used as a button (allows multiple payments for the same request or not).
+ButtonLabel | string | optional | This will be the text shown on your button (For example: "Pay here", "Donate").
+Html | string | optional | Provide the html code you will use to share the button on your website.
+Customer | object | optional | Customer.
+RecurringBilling | object | optional | See [Recurring Billing](#recurring-billing) for details.
+Invoice | object | optional | See [Invoice](#create-invoice) for details.
+
+
+
+### Response
+
+* 200 code (ok).
+
+
+### HTTP POST BACK SUCCESS
+
+If the transaction gets approved the user will be redirected back to your site, sending a POST to the SuccessURL with the parameters on the Json sample.
+
+
+### HTTP POST BACK ERROR
+
+If the transaction goes wrong the user will be redirected back to your site, sending a POST to OtherURL with the parameters on the Json sample.
+
+### PAY YOUR REQUEST
+
+Go to `https://webportalsandbox.choice.dev/HostedPaymentPage/{{tempToken}}`
+
+
+# Payment Button
+
+## Payment Button
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Account
+    {
+        public static void PaymentButton()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/HostedPaymentPageRequests");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var paymentButton = new
+                {
+                    DeviceCreditCardGuid = "2a566893-4ad3-4063-9f64-13ff055b695a",
+                    Merchantname = "StarCoffe",
+                    Description = "coffe latte",
+                    Amount = 7.50,
+                    isButton = true,
+                    buttonLabel = "button coffe latte",
+                    OtherURL = "http://StarCoffe/other",
+                    SuccessURL = "http://StarCoffe/success",
+                    CancelURL = "http://StarCoffe/cancel",
+                    OtherInfo = "coffe latte express"
+                };
+
+                string json = JsonConvert.SerializeObject(paymentButton);
+
+                request.Headers.Add("Authorization", "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6EBqB7RFjVMuhmuPNWcYM7ozyMb3uaDe0gyDL_nMPESbuM5I4skBOYcUM4A06NO88CVV3yBYee7mWB1qT-YFu5A3KZJSfRIbTX9GZdrZpi-JuWsx-7GE9GIYrNJ29BpaQscTwxYDr67WiFlCCrsCqWnCPJUjCFRIrTDltz8vM15mlgjiO0y04ZACGOWNNErIVegX062oydV7SqumGJEbS9Av4gdy");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }  
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "DeviceCreditCardGuid": "2a566893-4ad3-4063-9f64-13ff055b695a",
+    "Merchantname": "StarCoffe",
+    "Description": "coffe latte",
+    "Amount": 7.50,
+    "isButton": true,
+    "buttonLabel": "button coffe latte",
+    "OtherURL": "http://StarCoffe/other",
+    "SuccessURL": "http://StarCoffe/success",
+    "CancelURL": "http://StarCoffe/cancel",
+    "OtherInfo": "coffe latte express"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "merchantName": "StarCoffe",
+    "description": "coffe latte",
+    "amount": 7.50,
+    "otherUrl": "http://StarCoffe/other",
+    "successUrl": "http://StarCoffe/success",
+    "cancelUrl": "http://StarCoffe/cancel",
+    "tempToken": "cd5abbd7-501b-44dc-bb2d-013b3e971f1e",
+    "isButton": true,
+    "buttonLabel": "button coffe latte",
+    "status": "Button - Active",
+    "expiration": "2120-12-04T14:51:16.57",
+    "otherInfo": "coffe latte express"
+}
+```
+
+> **If the transaction gets approved the user will be redirected back to your site, sending a POST to the SuccessURL with the following parameters.**
+
+```json
+{
+ "PaymentType": "Credit Card",
+ "SaleGuid": "fa101801-1b87-495d-87b9-aeae745e9c85",
+ "TokenizedCard": "84yXtM3EcGze0103",
+ "OtherInfo": "",
+ "Status": "Success",
+ "AccountNumberLastFour": "1234",
+ "Receipt": "CHOICE MERCHANT SOLUTIONS<br/>8320 S HARDY DRIVE<br/>TEMPE AZ 85284<br/>07/07/2017 07:23:55<br/><br/>CREDIT - SALE<br/><br/>CARD # : **** **** **** 0103<br/>CARD TYPE : VISA<br/>Entry Mode : MANUAL<br/><br/>REF # : 13259222<br/>Invoice number : 13259222<br/>AUTH CODE : TAS869<br/>Subtotal:                       $13.50<br/>--------------------------------------<br/>Total:                          $13.50<br/>--------------------------------------<br/>Andres Ordonez<br/><br/>CUSTOMER ACKNOWLEDGES RECEIPT OF<br/>GOODS AND/OR SERVICES IN THE AMOUNT<br/>OF THE TOTAL SHOWN HEREON AND AGREES<br/>TO PERFORM THE OBLIGATIONS SET FORTH<br/>BY THE CUSTOMER`S AGREEMENT WITH THE<br/>ISSUER<br/>APPROVED<br/>Customer Copy<br/>"
+}
+```
+
+> **If the transaction goes wrong the user will be redirected back to your site, sending a POST to OtherURL with the following parameters**
+
+```json
+{
+ "Error": "The Sale could not be processed correctly. Error code D2020. Error message: CVV2 verification failed"
+}
+```
+
+
+
+Payment buttons allow you to seamlessly accept payments on your site.
+This feature will create a snippet of HTML code for a button you can add to your site allowing your customer to make a payment.
+
+### HTTP POST
+
+`POST https://sandbox.choice.dev/api/v1/HostedPaymentPageRequests`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type | M/C/O | Value
+--------- | ------- | ------- | -----------
+DeviceCreditCardGuid | string | Mandatory | Device's guid Credit Card.
+Merchantname | string | Mandatory | Merchant's name.
+Description | string | Optional first button, then mandatory | Items description.
+Amount | string | Optional first button, then mandatory | Items total amount.
+IsButton | boolean | Mandatory | Determines if the hosted payment page request will be used as a button (allows multiple payments for the same request or not).
+ButtonLabel | string | Mandatory | This will be the text shown on your button (For example: "Pay here", "Donate").
+OtherURL | string | Mandatory | Web page you want to redirect the user in case something failed.
+SuccessURL | string | Mandatory | Web page you want to redirect the user when transaction was successful.
+CancelURL | string | Mandatory | Web page you want to redirect the user in case he decided to cancel the transaction.
+OtherInfo | string | optional | Any alphanumeric code you might want to send to see it on the confirmation's response to keep track of your sales.
+
+
+
+### Response
+
+* 200 code (ok).
+
+
+### HTTP POST BACK SUCCESS
+
+If the transaction gets approved the user will be redirected back to your site, sending a POST to the SuccessURL with the parameters on the Json sample.
+
+
+### HTTP POST BACK ERROR
+
+If the transaction goes wrong the user will be redirected back to your site, sending a POST to OtherURL with the parameters on the Json sample.
+
+### PAY YOUR REQUEST
+
+Go to `https://webportalsandbox.choice.dev/HostedPaymentPage/{{tempToken}}`
+
+
+# Declined Response Codes
+
+### Codes
+
+Code | Response Message | Description
+--------- | ------- | -------
+D0001 | Duplicate Request (Approved previously) | The transaction was already performed and approved. Verify if the request was submitted twice for the same transaction ID or external reference number.
+D0003 | Duplicate Request (Declined previously) | The transaction was already performed and declined. Verify if the request was submitted twice for the same transaction ID or external reference number.
+D0004 | Reversal Not Allowed    | The transaction is not authorized for reversal. This error may occur because the transaction was not settled, was declined, or already reversed.
+D0005 | Return Not Allowed  | The transaction is not authorized for return. This error may occur because the transaction was not settled, was declined, or already reversed.
+D0006 | Supervisor Override Required     
+D0007 | Modify Transaction Not Allowed  | The transaction is not authorized for modification. This error may occur because the transaction was already settled, or was declined.
+D0008 | Possible Duplicate Request  | This is a duplicate request. The credentials for this transaction (i.e. amount, card number or same service) are the same as another transaction submitted less than one minute apart.
+D0009 | Duplicate Request (Reversed previously) | The request with the same credentials (amount, card number, or same service) hit the server twice within a minute.
+E0010 | Inactive Device (Terminal)  | The device is not registered, or is inactive in the system.
+E0011 | Device (Terminal) Configuration missing | The configuration parameter is missing.
+E0012 | Insufficient privileges  
+E0013 | Incremental Auth Not Allowed     
+E0015 | Unable to process your request. Settlement InProgress.  | The transaction settlement is in progress.
+E0016 | Functionality currently not available.  | The functionality is not supported.
+E0020 | Inactive Merchant (Account) | The merchant is not registered, or is inactive in the system.
+E0021 | Merchant (Account) configuration missing    | The configuration parameter is missing.
+E0022 | Processor configuration missing | The processor parameter is missing.
+D0023 | Merchant already active  
+E0030 | Unique ID Error The terminal unique ID is invalid, or is not registered in the system.
+D0050 | Inactive terminal (Backend) | The device is inactive, or is not registered at the host.
+D0060 | Inactive account (Backend)  | The account is inactive, or is not registered at the host.
+D0070 | Unique ID Error (Backend)   | The terminal unique ID is invalid, or is not registered at the host.
+D0080 | Duplicate Request (Backend) | This is a duplicate transaction. This transaction was already approved and processed.
+D0090 | Reversal Not Allowed (Backend)  | The transaction is not authorized for reversal. This error may occur because the transaction was settled, declined, or already reversed.
+D0091 | Return Not Allowed (Backend)    | The transaction is not authorized for return. This error may occur because the transaction was settled, declined, or already reversed.
+D0092 | Request Format Error (Backend) | 
+D0093 | Encryption failure from host  |    
+D0094 | Return not allowed, Card number requested does not match with original transaction card number  |  
+D0095 | Invalid taskID  |  
+D0096 | Currency code mismatch with original transaction    |  
+D0097 | Multiple amount format in single request not supported |   
+D0098 | Multiple tax with same tax type is not allowed. | A request includes multiple tax with same tax type. |
+E0110 | System Error (BillParam)  |    
+E0111 | System Error (UBillACC)  | 
+E0200 | System Error (Tran)  | 
+E0201 | System Error (BillpayTran)  |  
+E0202 | System Error (CardTran)  | 
+E0203 | System Error (CheckTran) |     
+E0204 | System Error (MTTran) |    
+E0205 | System Error (MOTran)  |   
+E0206 | System Error (AccTran)   | 
+E0207 | System Error (Shipping_Info Tran)   |  
+E0208 | System Error (Products Tran) |     
+E0209 | System Error (Override Tran)  |    
+E0210 | System Error (PayMode Tran)  | 
+E0300 | System Error (UTran)  |    
+E0301 | System Error (BillpayUTran) |  
+E0302 | System Error (CardUTran) |     
+E0303 | System Error (CheckUTran)  |   
+E0304 | System Error (MTUTran) |   
+E0305 | System Error (MoUTran)  |  
+E0306 | System Error (ACCUTran)  | 
+E0310 | System Error (BillPay WAY UTran) |
+E0311 | System Error (BillPay WAY Seq) |
+E0350 | System Error (UTranStatus) |
+E0360 | System Error (PERIUTran) |
+E0370 | System Error (SearchTran) |
+E0380 | System Error (chkc history) |
+E0400 | System Error (Login) |
+E0450 | System Error (NoFee) |
+E0451 | System Error (GetFEE) |
+E0460 | System Error (EXRate) |
+E0470 | System Error (PhCountry) |
+E0480 | System Error (PrePay Number) |
+E0481 | System Error (PrePay update) |
+E0482 | System Error (PrePay List) |
+E0490 | System Error (Bin Lookup) |
+E0491 | System Error (Merchant Bin Lookup) |
+E0500 | System Error (BrdCorp) |
+E0501 | System Error (BrdMer) |
+E0502 | System Error (Upate DeviceProc) |
+E0503 | System Error (Upate MerchProductProc) |
+E0504 | System Error (Upate LogoProc) |
+E0510 | System Error (Upate MerchantProc) |
+E0511 | System Error (Upate OperatorProc) |
+E0550 | System Error (Search Corporation) |
+E0551 | System Error (Search Merchant) |
+E0560 | System Error (Modify Schedule) |
+E0561 | System Error (Modify Payment) |
+E0600 | System Error (CCust) |
+E0601 | System Error (CCustID) |    
+E0610 | System Error (UCust) |      
+E0611 | System Error (UCustID) |    
+E0620 | System Error (SCust) |      
+E0621 | System Error (CustDt)  |    
+E0630 | System Error (ECustACC) |   
+E0631 | System Error (ECust) |      
+E0632 | System Error (Deactivate Cust Account) |    
+E0650 | System Error (CRec) |   
+E0651 | System Error (CRecID) |     
+E0660 | System Error (URec) |   
+E0661 | System Error (URecID) |     
+E0670 | System Error (SRec) |   
+E0671 | System Error (RecDt) |      
+E0672 | System Error (CAdminTran) |     
+E0673 | System Error (BoardFee) |   
+E0713 | Transaction Key Expired  | Transaction Key provided in request is expired. Register new key with our system.
+E0720 | System Error(Async Insert) |    
+E0721 | System Error (Async Update) |   
+E0722 | System Error (Async Call Fail) |    
+E0723 | System Error (Async Select Fail) |      
+E0724 | System Error (Key Gen Fail)  | System Error. Please contact help desk.
+E0800 | System Error (KeyNox Error) |   
+E0910 | Time out |      
+E0911 | System Error |      
+E0912 | Error on Host |     
+D1001 | Account Number Invalid   | Account number provided in request is not a valid account number.
+D1002 | Valid Account, Cash payments only.  |   
+D1003 | Amount invalid. |   
+D1004 | Biller ID Invalid. |    Biller ID provided in request is not valid.
+D1005 | Cash only biller. |     
+D1006 | Bill Pay Processor Code is missing or is incorrect. Processing host is not configured please contact help desk. | 
+D1007 | One or more Fields missing or incorrect. |      
+D1020 | Pre Pay Number not available. |     
+D1201 | Unable to determine merchant ID. |  Merchant is not register with Mobilozophy.
+D1202 | Unable to process your request. |   
+D1203 | Invalid redemption code. |  Redemption code provided in request is invalid.
+D1204 | Unable to determine coupon ID. |    Unable to determine coupon ID.
+D1205 | Coupon not valid at this location. |    Coupon not valid at this location.
+D1206 | Minimum Purchase Amount criteria not met. |     Minimum Purchase Amount criteria not met.
+D1207 | Either end user ID or registration ID is required. |    Either end user ID or registration ID is required.
+D1208 | Unable to modify coupon.  | Modification of coupon data is not allowed.
+D1209 | Unable to modify coupon.  | Modification of coupon data is not allowed.
+D1210 | Unable to modify coupon.  | Modification of coupon data is not allowed.
+D1211 | Unable to modify coupon.  | Modification of coupon data is not allowed.
+D1212 | This code has already been redeemed.  | This code has already been redeemed.
+D1213 | This code has been deleted.   | This code has been deleted.
+D1214 | Invalid store ID. |     Invalid store ID.
+D1215 | Invalid amount. |   Amount provided in request is invalid.
+D1217 | Coupon service is temporarily unavailable. |  Coupon service is temporarily unavailable.
+D1999 | General Bill Pay Decline. |     General declined please contact help desk.
+D2001 | Refer to Issuer.  | The merchant must call the issuer to obtain verbal authorization.
+D2002 | Suspected Card (pick-up, hot-card)  | This credit card has been flagged for fraud. the merchant should call the number on the back of the card to obtain further instructions. Suspected card error occurs in the following scenarios: 1-The card is restricted by the issuer 2-Loss of card is reported 3-Theft of card is reported
+D2003 | Honor with identification?   | The card is not identified.
+D2004 | Invalid Amount   | The amount exceeds the limits established by the issuer for this type of transaction.
+D2005 | Invalid Card     | The issuer indicates that this card is invalid.
+D2006 | No such issuer   | The card issuer number is invalid.
+D2007 | Invalid fee  | The transaction fee is unacceptable.
+D2008 | Incorrect Pin    | The PIN entered by the cardholder is incorrect.
+D2009 | Pin attempts exceeded    | The number of attempts to enter the PIN has exceeded.
+D2010 | Key synchronization failed from the host     | The failure of a key synchronization from the host.
+D2011 | Expired Card     | The card has expired.
+D2012 | Insufficient Funds   | The credit limit for this account has exceeded, or the amount is not enough to perform the transaction.
+D2013 | Invalid From Account     | The transaction account is invalid.
+D2014 | Invalid To Account   | The transaction account is invalid.
+D2015 | Withdrawal Limit exceeded    | The withdrawal limit on an account is exceeded.
+D2016 | Withdrawal frequency exceeded    | The withdrawal frequency on an account is exceeded.
+D2017 | Time limit for Pre-Auth reached  | The time for Pre-Auth has reached its limit.
+D2018 | AVS FAILED   | The address verification has failed and the merchant is configured for auto decline on AVS failure.
+D2019 | Billing ZIP Mismatch     | The zip provided does not match the billing address on file and merchant is configured for auto decline on ZIP code mismatch.
+D2020 | CVV2 verification failed     | The V code provided is invalid or does not match what is on file and merchant set up for auto decline on CVV2 failure.
+D2021 | Issuer or Switch inoperative     | The bank is unavailable to authorize this transaction.
+D2022 | Duplicate transaction ( Same amount / Account)   | The transaction with same amount and account is performed twice.
+D2023 | Balance unavailable for inquiry  | The balance cannot be validated.
+D2024 | Check Digit Err  | The credit card number entered did not pass validation. Correct and re-enter the credit card number.
+D2025 | Excluded Bin ID for Merchant     | Card is not allowed to do transaction at this merchant.
+D2026 | Do not honor     | The transaction was declined by the issuer.
+D2027 | AVS and CVV2 failed  | The address verification and V code verification failed and merchant set up for auto decline on AVS anc CVV2 failure.
+D2028 |  Invalid Date    | The credit card expiration date is invalid. Verify and re-enter the expiration date.
+D2029 |  Invalid Service | The service provided by the card is invalid.
+D2030 |  Host Validation Error   | The host is an invalid host.
+D2031 |  Activity Limit exceeded | The daily card activity limit has been exceeded.
+D2032 |  Cannot complete because of Violation    | The transaction cannot be completed because the credit card account has been flagged with a violation.
+D2033 |  Debit Pin Required |   
+D2034 |  Debit Pin Required  | The BIN is blocked by the issuer.
+D2035 |  Check Service authentication failure |     
+D2039 |  Could Not Retrieve a Valid Card Number for Token |     
+E2042 |  No Card found for the BIN No Card found for the BIN |  
+D2200 |  UNKNOWN_ERROR |    
+D2201 |  CONTENT_TYPE_NOT_SET |     
+D2202 |  UNKNOWN_CONTENT_TYPE |     
+D2203 |  CONTENT_LENGTH_NOT_SET |   
+D2204 |  INCOMING_REQUEST_READ_ERROR  | 
+D2205 |  OUTGOING_RESPONSE_SEND_ERROR |     
+D2206 |  INPUT_VALIDATION_ERROR  |  
+D2208 |  OCT_FAILED |   
+D2209 |  AFT_FAILED |   
+D2210 |  AFTR_FAILED |  
+D2211 |  REMOTE_VPP_ERROR |     
+D2212 |  INVALID_ISSUER_COUNTRY_CODE |  
+D2213 |  FAST_FUNDS_NOT_ENABLED |   
+D2214 |  INTERNAL_ERROR |   
+D2215 |  ACNL_FAILED |  
+D2216 |  ReceiverLimitExceeded |    
+D2800 |  Invalid FCS ID |   
+D2801 |  Invalid Voucher Serial Number |    
+D2802 |  Invalid Voucher Approval Code |    
+D2803 |  Electronics Benefit Transactions cannot contain Fee or Tax |  
+D2998 |  PreFraudScout Decline   | Transaction is declined in Pre Fraud rules.
+D2999 |  General Card Auth Decline   | This is a general decline error.
+D3001 |  Invalid Bank Routing Number | Invalid routing number in the request message.
+D3002 |  Invalid Bank Account Number | The bank account number in the request message is invalid.
+D3003 |  Invalid MICR Data   | The MICR data in the request message is invalid.
+D3004 |  Invalid Account Type    | The account type in the request message is invalid.
+D3005 |  Invalid Check Type  | The check type in the request message is invalid.
+D3006 |  Invalid Amount  | The amount for a transaction is invalid.
+D3007 |  Missing Signature |     
+D3008 |  Missing Endorsement  | 
+D3009 |  Invalid Check Date  | The date format in the request message is invalid.
+D3010 |  Car Lar Mismatch    | Mismatch between the check amount written in numbers (courtesy amount) and letters (legal amount) provided on check image.
+D3011 | CallNox Timeout | 
+D3012 | Duplicate Check  |
+D3013 | Blocked Account | The account provided in transaction is blocked.
+D3014 | Blocked Check   | The check provided in transaction is blocked.
+D3015 | Cannot Process Image  |   
+D3016 | Invalid Check Number    | The check number in the request message is invalid.
+D3017 | Bank Account Closed | The bank account does not exist.
+D3018 | Decline NSF  |
+D3019 | Check Image Decline  |
+D3020 | Invalid SEC  |
+D3101 | Maker Check Return Stop Pay Limit Exceeded  | 
+D3102 | Maker Check Return No Auth Limit Exceeded |   
+D3103 | Maker Check Return No Settlement Limit Exceeded  | 
+D3104 | Maker Check Return NSF/Other Limit Exceeded  | 
+D3105 | Maker Check Return Limit Exceeded|     
+D3106 | Customer Check Return Stop Pay Limit Exceeded |    
+D3107 | Customer Check Return No Auth Limit Exceeded|      
+D3108 | Customer Check Return No Settlement Limit Exceede|   
+D3109 | Customer Check Return NSF/Other Limit Exceeded |   
+D3110 | Customer Check Return Limit Exceeded |     
+D3111 | Check Image Processing Error |     
+D3112 | Customer Check Cashing Limit Exceeded|    
+D3200 | Record(s) Processed Successfully |     
+D3201 | Duplicate Custom Fields Not Allowed.  | Duplicate Custom Field Not Allowed.
+D3202 | Item code already exists.   | Item code already exists.
+D3203 | Custom Field Type cannot be modified during update. | Custom Field Type cannot be modified during update.
+D3204 | Could not find Product for Update.  | Product is not registered in the system.
+D3205 | Could not find Product for Removal. | Product is not registered in the system.
+D3206 | Unidentified Tax Category   | Tax Category is not set in our system.
+D3207 |  Some Record(s) Processed Successfully  |  
+D3208 |  No Records Processed    | No records are processed further.
+D3211 |  Parsing Failed  | Issue with request parameter.
+D3212 |  Product Enroll Fail at Merchant Level   | Merchant level data is not added or updated in the system.
+D3213 |  Item code not provided  | The item code in the request message is invalid.
+D3214 |  Product Enroll Fail at Merchant Custom Level    | Merchant level custom data is not added and updated in the system.
+D3215 |  Product Enroll Fail at Global Level | The UPC level data is not added and updated in our system.
+D3216 | Product Removal Failed  | Product Removal Failed.
+D3217 | No Tax Category Found   | No Tax Category Found.
+D3218 | Category already exists | 
+D3219 | Invalid Category Code |   
+D3220 | Modifier already exists | 
+D3221 | Invalid Modifier Code |   
+D3222 | Variation already exists  |   
+D3223 | Invalid Variation |   
+D3224 | Invalid Product Code |    
+D3225 | Duplicate Variation Option Fields Not Allowed |   
+D3226 | Discount already exists | 
+D3227 | Start Date should be current date or future date |    
+D3228 | End Date should be current date or future date |  
+D3229 | Invalid Discount Code |   
+D3230 | No Product found for given search criteria. | No product is found for given search criteria.
+D3231 | End Date should be greater than Start Date |  
+D3232 | Discount amount should be less than Max Discount amount |  
+D3233 | Discount percentage should be less than 100  |
+D3234 | Max Discount amount should be less than Discount Qualifying amount |  
+D3235 | Discount Code already removed  |  
+D3236 | Already Associated |  
+D3237 | Invalid role |    
+D3238 | Invalid Operation |   
+D3239 | Role Already Exist |  
+D3240 | Operation Type Already Exist  |   
+D3241 | Role does not Exist | 
+D3242 | Role can not be Deleted  |
+D3243 | Default Role can not be Modified |    
+D3250 | Invalid modifierOptionDetails   | Invalid modifierOptionDetails
+D3253 | Order service date can not be a previous date |   
+E3254 | Order creation failed |   
+E3255 | OrderID not found |    
+E3256 | Order updation failed |   
+E3257 | Order can not be modified |   
+D3259 | Invalid modifier categoryCode  | Invalid modifier categoryCode
+D3260 | Invalid product categoryCode   | Invalid product categoryCode
+D3264 | currentPaymentSequenceNumber should be less than and equal totalPaymentCount   | The currentPaymentSequenceNumber value entered does not meet the required criteria.
+D3999 | Check Auth Decline |  
+D4000 | Invalid content, one of {encodedCardData, keyedCardData, returnTransactionData} group is required  |  
+E4001 | Invalid Source Country Code | 
+E4002 | Invalid Source Currency Code |     
+E4003 | Invalid Destination Location |    
+E4004 | Invalid Destination Currency Code   | 
+E4005 | Invalid Source Agent |    
+E4006 | Invalid Destination Agent |   
+E4007 | Invalid Conversion Rate | 
+E4008 | Invalid Fee | 
+E4009 | Missing/Invalid Amount |  
+E4010 | Missing/Invalid Payout Amount |   
+E4011 | Invalid MTCN |    
+E4012 | Duplicate transaction ( Same amount/ Account ). | 
+E4050 | Missing /Invalid Sender Name  |   
+E4051 | Invalid Sender ID Type |  
+E4052 | Invalid Sender ID  |  
+E4053 | Invalid Sender Address  | 
+E4054 | Invalid Sender phone number | 
+E4055 | Missing /Invalid Receiver Name |  
+E4056 | Invalid Receiver ID Type |    
+E4057 | Invalid Receiver ID  |
+E4058 | Invalid Receiver Address |    
+E4059 | Invalid Receiver phone number |   
+E4060 | Missing / Invalid Input  |
+E4999 | General Money Transfer Decline |  
+E5000 | Invalid Money order Number.|  
+E5001 | Invalid Amount.  |
+E5002 | Missing Payee Name. | 
+D5201 | Invalid Page size in the request  |   
+D5202 | Invalid Report column name for requested report  |
+D5203 | Invalid date range, redefine your search |    
+D5204 | Invalid search column for requested report  | 
+D5205 | Invalid optional column for requested report  |   
+D5206 | Invalid Report column name for requested report | 
+D5207 | Invalid/Expired Report data identifier  | 
+D5208 | Invalid search column value for requested report |    
+D5209 | No data found, please redefine your search  | 
+D5210 | One or more duplicate columns used for search, sort or for optional columns  |
+D5211 | Invalid search condition, transactionID is required  
+D5212 | Invalid search condition, productCode is required    
+D5213 | Service is temporarily unavailable.Please try later  
+E5213 | Service is temporarily unavailable.Please try later  
+D5214 | Invalid search condition, dateRange is required  
+E5500 | Invalid Payroll Info     
+E5599 | General Payroll Decline.     
+E5999 | General Money order Decline  
+E6000 | Missing /Invalid Name    
+E6001 | Invalid ID Type  
+E6002 | Invalid ID Number    
+E6004 | Invalid Address | The address provided in the transaction is invalid.
+E6005 | Invalid phone number    | The phone number provided in the transaction is Invalid.
+E6006 | Invalid SSN | The SSN provided in the transaction is Invalid.
+E6007 | Invalid DOB | The DOB provided in the transaction is Invalid.
+E6008 | Missing/Invalid Gender   
+E6009 | Missing/Invalid customer Image   
+E6010 | Missing/Invalid ID Image     
+E6011 | Missing/Invalid Finger Print Image   
+E6012 | Biometric Auth failure   
+E6013 | BFD failed   
+E6014 | OTP failed   
+E6050 | Duplicate Enrollment | The Customer is enrolled. Verify if the request is send twice for the same customer.
+E6051 | OFAC Match   
+E6052 | Blocked Customer     
+E6053 | Blocked Biometrics   
+E6054 | Declined Score below threshold.  |
+E6055 | Customer Not Enrolled.  | The customer code provided in request is not registered.
+E6056 | Financial Account Not Enrolled. | 
+E6057 | Customer requested stop of specific recurring payment   | Customers request to stop recurring payments.
+E6058 | Customer requested stop of all recurring payments from specific merchant    | Customers request to stop recurring payments from specific merchant.
+E6059 | Missing Customer ID/External Customer Number    | Customer ID or external customer number is not provided in request.
+E6060 | Inactive Customer   | Inactive Customer
+E6061 | Invalid UID | UID number provided in request is invalid.
+E6062 | Incorrect or No Card Indicator Value |    
+E6063 | Customer Group Name already exists |  
+E6064 | Invalid Customer Group code | 
+E6065 | Customer Code already associated |    
+E6066 | Invalid Customer Code  |  
+E6067 | Search criteria not found.  | The search request does not include any search criteria fields.The search criteria includes the firstName, lastName, paymentInstrumentID, or customerID fields.
+E6068 | External Customer number is already available. |   
+E6069 | Invalid Search Criteria  |
+E6071 | Customer modification not allowed, payment is in process.  | The application is unable to delete a customer record while a recurring transaction for the customer is processing.
+E6072 | Transaction is in process. Please try again after some time.   | Simultaneous actions cannot be performed on the same customer record. The application is unable to perform edits on a customer record while the record is in use.
+E6100 | Inactive Customer   | Inactive Customer.
+E6901 | Duplicate Schedule Billing Reference Number | Duplicate schedule billing reference number.
+E6902 | Payment Count Cannot be Greater than Processed Count    | Payment count cannot be greater than processed count.
+E6903 | Next start date cannot be earlier than Current Date | Next start date cannot be earlier than current date.
+E6904 | Schedule cannot be added without a Payment Methods (i.e. Card, Account...) |   
+E6905 | Schedule not found   | 
+E6906 | Invalid Schedule string |  
+E6999 | General Customer Auth Decline   | General declined.
+D7000 | Record not found    | The transaction requested is not available.
+E7001 | Invalid User ID | The user Id provided in request message is invalid.
+E7002 | Record Not Found.   | The Transaction is not present in the system.
+E7003 | User Locked. Call CSR  |   
+E7004 | Invalid Security Question/Answer    | Invalid security question and answer.
+E7005 | User Already Logged in  | User Already Logged in try after some time.
+E7006 | Your Password has Expired, Please change the password.  | Change your password.
+E7007 | User Inactive. Call CSR  | 
+E7008 | Operator Not Found  | The user ID is not registered in the system.
+E7009 | Expired Client Password | The client password is expired.
+E7010 | Invalid Host ID | The Host Id provided in the request message is invalid.
+E7011 | Client Authentication Failed    | This message may occur for more than one reason. 1.  The manifest included in the request is not configured properly. 2.  The Domain Key included in the request manifest is expired. 3.  The Host Password included in the request is expired.
+E7012 | Invalid user or password    | The User id and password is invalid.
+D7013 | Multiple users with same email. Enter Login ID  |  
+E7013 | Multiple users with same email. Enter Login ID  | There are multiple users with the same email ID. Enter your login ID.
+E7014 | Invalid Manifest    | Manifest provided in the request message is invalid.
+E7015 | Invalid Transaction Key | The transaction key provided in the request message is invalid.
+E7016 | Invalid UserID or EmailID |    
+D7017 | User Modification Request Failed   |   
+E7018 | The provided authentication credentials are not correct |  
+E7019 | Duplicate Questions/answers not allowed |  
+E7020 | The question cannot be same as any of the answers |    
+E7021 | Unable to process, retry with terminalNumber |     
+E7022 | Unable to process, retry with profileName or profileID |   
+E7023 | Unable to find profile|    
+E7024 | Security question expired, please fetch a new question|    
+E7027 | Unable to process, retry with userID    | Multiple entries found for the merchantID and emailID search criteria used.
+E7100 | General Login Decline   | General Login Decline.
+E7101 | User_ID already exists  | User_ID already exists.
+E7102 | Operation not allowed   | Operation not allowed.
+E7103 | Operator not Register/Present   | Operator is not Register or Present in the system.
+E7104 | Last active admin operator in the system    | The last Active Admin operator in the system. At least one Admin operator should be active for a merchant.
+E7105 | Admin operator cannot change his own status or type | The Admin operator cannot change his own profile details.
+E7106 | Not allowed to add Administrator    | The operator is not allowed to add Admin operator.
+E7107 | Input Password does not adhere to complexity norms  | The Input Password does not adhere to complexity norms.
+E7108 | New password must not match previous password. Please enter a unique new password   | The new password must not match previous password. Please enter a unique new password.
+E7109 | Suspended/Inactive User | The User Id provided in request is Suspended or Inactive. Please reactivate to perform transaction.
+E7110 | Invalid password length | The password length must be between 8 and 20 characters.
+E7111 | Parameter validation Error |   
+E7112 | User already exists |  
+E7113 | User Credential not active |   
+E7114 | Security question not set for user  |  
+E7200 | General User Admin Decline  | General User Admin Decline.
+E7201 | Client not registered to our system.    | The client domain name or unique ID is not registered.
+E7202 | Invalid Client Key  | The client key is invalid. Re-enter the correct key and resubmit the transaction.
+E7203 | Client Validity Expired, Please re-register | The client validity is expired. Re-register the domain or the unique ID.
+E7204 | Invalid merchant details |     
+E7251 | Invalid one time password   | The one time password is invalid. Re-enter the correct password and resubmit the transaction.
+E7252 | Duplicate one time password | The one time password is a duplicate. Re-enter the correct password and resubmit the transaction.
+E7253 | One time password validity expired  | The one time password has expired. Generate a new password and resubmit the transaction.
+E7254 | Host Operator not allowed   | The host operator is not allowed.
+E7255 | Operator is not Host    | The operator ID for this transaction is invalid.
+E7256 | Token services cannot be enabled until the merchant account is set up with a token zone | Tokenization service is not enabled for the merchant.
+E7257 | Tokenization service not enabled    | Tokenization service not enabled for the merchant.
+E7259 | De-tokenization service not enabled | De-tokenization service is not enabled for the merchant.
+E7260 | De-tokenization UnSuccessful    | The token is invalid. Resubmit with a valid token number.
+E7261 | Tokenization UnSuccessful   | Service is not available. Resubmit the transaction.
+D7500 | record not found (backend)  | The record was not found.
+D7501 | Chargeback Protection is not allowed    | The transaction is not eligible for Chargeback Protection.
+E8000 | Customer not found  | Customer is not register in our system.
+E8001 | Customer not enrolled   | Customer is not register in our system.
+E8002 | Customer Declined   | Customer enrollment declined.
+E8003 | Customer Locked | Customer is locked in system.
+E8004 | Invalid user or password    | Invalid user or password.
+E8005 | Credit Limit Reached    | Max Credit Limit Reached.
+E8006 | Local Opt Out   | Local Opt Out.
+E8007 | Invalid Message | Invalid Message
+E8008 | Globally Opted Out phone number | Globally Opted Out phone number
+F8009 | Invalid Email   | Invalid Email
+E8900 | System Error    | System Error.
+E8999 | General Notify Decline. | General Notify Decline.
+D9000 | Amount Limit Exceeded   | Amount Limit Exceeded for transaction.
+D9001 | Transaction count Limit Exceeded    | Transaction count Limit Exceeded.
+D9002 | Device activity Limit Exceeded  | Device activity Limit Exceeded.
+D9003 | Amount per days Limit Exceeded  | Amount per days Limit Exceeded.
+D9004 | Excluded Customer   | Customer is excluded to perform transaction at this merchant.
+E9005 | Invalid Cashback amount | Cash back amount provided in request is invalid. Cash back should always be less then transaction amount.
+E9006 | Cashback Amount is not allowed for this type of transaction | Cashback Amount is not allowed for this type of transaction.
+D9007 | Maximum Line Items Exceeded Maximum Line Items Limit Exceeded |    
+D9008 | BC limit not set for merchant. BC limit not set for merchant. |    
+D9009 | BC buffer percent was not set for merchant. BC buffer percent was not set for merchant |   
+D9010 | Invalid Transaction_Info/Service_Code.  | The error occurs in the scenarios as follows: 1-Service code is missing in the request. 2-Service code is invalid. 3-Service code is inadequate for this type of transaction.
+D9011 | Net Balance is less than zero |    
+D9012 | Invalid Merchant_Info/Agent_Chain_Number must be 6 bytes  |    
+D9013 | Invalid Transaction type Invalid Transaction type  |   
+D9014 | Merchant Per Transaction Deposit Limit Exceeded Transaction Deposit Limit Exceeded  |  
+D9015 | Head Quarter merchant not found. Head Quarter merchant not found. |    
+D9018 | No Valid Data Found,Please Generate Token First.  |    
+D9019 | Invalid Token|     
+D9020 | Invalid Transaction_Info/SubServiceCode | The error occurs in the scenarios as follows: 1- Sub service code is missing in request. 2- Sub service code is invalid. 3- Sub service code is inadequate for this type of transaction.
+D9021 | Invalid Transaction_Info/Type.  | The error occurs in the scenarios as follows: 1-Type is missing in request. 2-Type is invalid. 3-Type is inadequate for this type of transaction.
+D9022 | Invalid Transaction_Info/Transaction_ID | Transaction ID is expected in request for this transaction. Re-enter the Transaction ID, and resend the transaction.
+D9030 | Invalid Device_Info/Device_Type | Device is inadequate to do this type of transaction.
+D9040 | Invalid Processor_Info/Acquirer_Institute must be 6 bytes   | Acquirer_Institute must be 6 bytes.
+D9050 | Invalid Processor_Info/Proc_Merchant_Id must be 12 bytes    | Proc_Merchant_Id must be 12 bytes.
+D9070 | Invalid Processor_Info/Processor_Term must be 4 bytes   | Processor_Term must be 4 bytes.
+D9080 | Invalid Processor_Info/Store_Number must be 4 bytes | Store_Number must be 4 bytes.
+D9090 | Invalid Merchant_Info/MerchantType  | The merchant name is invalid or is not present.
+D9091 | Invalid Merchant_Info/Name  | 
+D9092 | Invalid Merchant_Info/City |  
+D9093 | Invalid Merchant_Info/State|  
+D9094 | Invalid Merchant_Info/TimeZone must be 3 bytes   |
+D9096 | Invalid Transaction_Info/Time_Stamp must be [MMDDYY HHMMSS]|  
+D9100 | Fee Configuration Level must be mentioned |   
+D9101 | Fee not configured |  
+D9110 | Invalid Merchant_Info/SICCODE must be 4 bytes. |  
+D9111 | Invalid Processor_Info/Sequence_Number must be 4 bytes|    
+D9120 | Invalid Card_Info/PIN   |  
+D9130 | Invalid Transaction_Info/Country_Code must be at least 2 bytes. |  
+D9140 | Invalid Card_Info/Type|    
+D9210 | Invalid Card_Info/PIN |    
+D9211 | Invalid Card_Info/Token |  
+D9212 | Invalid Card_Info/KSN must be at least 16 chars  | 
+D9240 | Invalid Merchant_Info/Agent_Bank_Number must be 6 bytes. |     
+D9250 | Invalid Merchant_Info/Agent_Chain_Number must be 6 bytes |     
+D9260 | Invalid Processor_Info/Batch_Number must be 3 bytes |  
+D9270 | Invalid Merchant_Info/Reimburse_Attr must be 1 byte|   
+D9280 | Invalid Merchant_Info/ABA_Number must be 9 bytes |     
+D9282 | Invalid Merchant_Info/Settle_Agent_Number must be 4 bytes|     
+D9283 | Check Out date can not be less than or equal to Check In date |    
+D9284 | Transaction amount should not be greater than authorized amount |  
+D9286 | Invalid CheckoutID  | The checkOutID provided is incorrect. Provide the correct checkOutID.
+D9287 | Duplicate card sequence number |   
+E9288 | Invalid Wallet Identifier Format |     
+E9289 | Encoded Data is not allowed with checkoutID  | 
+D9290 | Invalid Transaction_Info/Orig_Purchase_Date must be MMDDHHMM |     
+E9291 | Keyed Card Data is not allowed with checkoutID  |  
+E9292 | Mandatory Tags are missing |   
+E9293 | Card Type not supported for requeted service |     
+E9294 | terminalData {terminalCapability, terminalOperatingEnvironment, cardholderAuthenticationMethod, terminalAuthenticationCapability, terminalOutputCapability,maxPinLength} group is required |   
+E9295 | cardholderAuthenticationMethod must be PIN |   
+D9500 | Encryption services not enabled for the device  | Encryption services are not enabled for the device.
+D9501 | Encryption service requested not enabled for the device | The device has encryption service but the encryption service requested is not enabled.
+D9502 | Encryption method could not be determined   | The device is configured with more than one encryption service. The request does not indicate which service to use.
+D9503 | Decryption unsuccessful | The decryption failed.
+D9504 | Invalid Format Id  |   
+D9505 | Product Details is required to perform this action |   
+D9510 | Invalid Encryption Type | An invalid encryption type was included in the request.
+D9511 | A unique KSN not generated or not sent in request   | The application was unable to generate or submit the key serial number.
+D9610 | Data Parsing fail   | Data parsing failed.
+D9611 | Encrypted Data not generated or not sent in request | Encrypted data was not received from the host or the application was unable to include this data in the response.
+F9900 | XSD Format Error    | XSD Format Error
+F9901 | Format Error field details  | Format Error field details
+F9902 | Group encodedCardData is not allowed with cardDataSource value MANUAL  |  
+F9903 | Group encodedCardData is not allowed with cardDataSource value PHONE |    
+F9904 | Group encodedCardData is not allowed with cardDataSource value EMAIL|     
+F9905 | Group encodedCardData is not allowed with cardDataSource value INTERNET|  
+F9906 | Group keyedCardData is not allowed with cardDataSource value SWIPE |  
+F9907 | Invalid cardDataSource for requested service.|    
+F9908 | Sum of elements of group additionalCharges should not be greater than transactionAmount.|     
+F9909 | cashTendered must not be less than transactionAmount|     
+F9910 | lastChipRead is Mandatory with Fallback Swipe (Icc Terminal Error) transaction|   
+F9911 | lastchipRead is not Allowed with Fallback Swipe (Empty Candidate List) transaction |  
+F9912 | Invalid content, one of {track1Data, track2Data, track3Data} is required |    
+F9913 | Invalid content, {encodedCardData, keyedCardData or swipedCardData} is not Allowed with Chip Card |   
+F9914 | emvFallbackCondition is Mandatory with Fallback Swipe transaction  |  
+F9915 | voidReason is Mandatory for Chip Card transaction |   
+F9916 | Fallback Swipe allowed with track2Data only  |
+F9917 | Invalid emvTags, {9F1F or 9F20 or 57 or 5A} | Tags 9F1F, 9F20, 57 and 5A are not allowed if encryptionType is VOLTAGE
+F9918 | Invalid content, {track1Data, track3Data, emulatedTrackData} is not Allowed with Chip Card and encryptionType   | track1Data, track3Data, and emulatedTrackData are not allowed if encryptionType is VOLTAGE
+
+
+# Other Errors
+
+Error Description | Reason | Location
+--------- | ------- | -------
+"Unable to decode the Model" | The Json you sent doesn’t match a valid input | Any endpoint.
+“The (entity) could not be saved because of an unmanaged exception” | An unknown reason didn’t allow the system to save the entity. Please contact support. | Any endpoint
+“Update (entity) did not finish correctly because of an unmanaged exception”    | An unknown reason didn’t allow the system to update the entity. Please contact support.   | Any endpoint
+“The (entity) could not be retrieved because of an unmanaged exception” | An unknown reason didn’t allow the system to retrieve the entity. Please contact support. | Any endpoint
+“No Devices were found for the given User/Merchant relationship”    | You sent a device GUID that does not belong to a merchant administrated by the logged user. Please try with a different GUID. | Any transaction endpoint
+“No Merchant was found for the current User”    | You sent a device GUID that does not belong to a merchant administrated by the logged user. Please try with a different GUID. | Any transaction endpoint
+“Invalid Routing Number: invalid digit” | You sent and invalid Routing Number. Please try with a different one. | Create Bank Clearing
+“Invalid Routing Number: digit check failed”    | You sent and invalid Routing Number. Please try with a different one. | Create Bank Clearing
+“An error occurred while executing Transaction General Check”   | There is some inconsistence between your devices, Merchant Processor accounts and Merchants. Please contact support.  | Any transaction endpoint.
+“Invalid Device GUID”   | You sent a device GUID that does not exist at all. Please try with a different GUID.  | Any transaction endpoint.
+“BankAccount reference not found.”  | You sent an invalid BankAccount GUID. Please try with a different GUID.   | Create Bank Clearing.
+“At least one of SSN4 or DateOfBirth are required.” | You attempted to create a bank clearing without providing SSN4 or Date of Birth of the bank account owner. Please provide any of those two.   | Create Bank Clearing.
+The DriverLicenseState and DriverLicenseNumber fields are required. | You didn’t provide Driver License State nor Driver License Number.    | Create Bank Clearing.
+“The transaction was not originated in any device of the current user.” | You are trying to void or refund a sale or bank clearing that was run on a device that is not administrated by the logged user.   | Void Bank Clearing, Refund Bank Clearing, Void Sale, Refund Sale
+“There was a database error”    | There was some inconsistence on the database, please contact support. | Any endpoint.
+“The related clearing is not settled. It can be voided only”    | You attempted to refund a not settled bank clearing.  | Refund Bank Clearing.
+“The related clearing is already voided”    | You attempted to void or refund an already voided Bank Clearing.  | Void Bank Clearing, Refund Bank Clearing.
+“The related clearing is already returned”  | You attempted to void or refund an already refunded Bank Clearing.    | Void Bank Clearing, Refund Bank Clearing.
+“The related clearing was not processed, therefore it cannot be voided” | You attempted to void or refund a Bank Clearing that didn’t run successfully. | Void Bank Clearing, Refund Bank Clearing.
+“Invalid (entity) GUID” | You attempted to void or refund a Bank Clearing or a Sale or to capture an Auth Only using an invalid Guid.   | Capture Auth Only, Void Sale, Refund Sale, Void Bank Clearing, Refund Bank Clearing.
+“No (entity) could be found for the given Id”   | You attempted to updated or retrieve an entity using an invalid Guid. | Any endpoint.
+“Credit Cards not allowed for this processor”   | You attempted to run a Sale or Auth Only on a Merchant Processor Account that is Debit Only.  | Create Auth Only, Create Sale.
+“Debit Cards not allowed for this processor”    | You attempted to run a Sale or Auth Only on a Merchant Processor Account that is Credit Only. | Create Auth Only, Create Sale.
+“The (transaction) could not be processed correctly. Error code (error code). Error message: (error message)”   | The transaction didn’t run for reason provided by the processor. If you have any question regarding this error, please contact support.   | Any transaction endpoint.
+“No open batch” | For some reason, there was no open batch when you attempted to run a sale or auth only. Please contact support.   | Create Auth Only, Create Sale.
+“Invalid CardDataSource”    | You provided an invalid card data source. | Create Auth Only, Create Sale.
+“The (transaction)  amount must be greater than zero”   | You provided a negative or zero amount for the transaction.   | Any transaction endpoint.
+“The (transaction) could not be fetched because of an unmanaged exception”  | Something when wrong when trying to retrieve the entity. Please contact support.  | Any endpoint.
+“There is an approved Capture for this AuthOnly already”    | You attempted to capture an already captured Auth Only.   | Create Capture.
+“The referenced AuthOnly and this Capture devices are not from the same MerchantAccount”    | You attempted to capture an AuthOnly using a device guid belonging to a different merchant processor account. | Create Capture.
+“The Capture AuthOnlyGuid value does not have matching results.”    | You attempted to capture an AuthOnly using an invalid Auth Only Guid. | Create Capture.
+“There is no Batch for the given guid.” | For some reason, there was no open batch when you attempted to run the transaction. Please contact support.|  Any transaction endpoint.
+“Only one of Bank Account or Card can be used.” | You sent both, a Credit Card and a Bank Account, when trying to create a Recurring Billing    | Create Recurring Billing.
+“The device hierarchy and settings could not be loaded” | Something is wrong with the merchant processor account of the device you provided. Please contact support.    | Create Recurring Billing.
+“The current Merchant Processor Account does not allow Tokenization. Tokenization is required to create Recurring Billings.”    | You provided a device guid belonging to a merchant processor account that does not have Tokenization activated.   | Create Recurring Billing.
+“The setup of this device does not allow this operation. Processor Transaction Type is not Card nor ACH”    | You provided a Credit Card for an ACH Merchant Processor Account or a Bank Account for a Credit Card Merchant Processor Account.  | Create Recurring Billing.
+“Required data for a Recurring Billing with Card are: FirstName, LastName, Email and Phone” | You’re missing at least one of First Name, Last Name, Email or Phone when trying to create a Recurring Billing using a credit card.   | Create Recurring Billing.
+“An Email is required for a Recurring Billing with ACH” | You’re missing e-mail address when trying to create a Recurring Billing using a Bank Account  | Create Recurring Billing.
+“There are no payments to be generated for the given parameters (StartDate, EndDate, PaymentCount, Interval, IntervalValue)”    | You sent a combination of parameters that didn’t result in any possible payment.  | Create Recurring Billing.
+“Invalid Card or Bank Account”  | You provided an invalid credit card or an invalid bank account when trying to create a recurring billing. | Create Recurring Billing.
+“Customer data not present” | You provided a Credit Card or Bank Account without the customer’s information.    | Create Recurring Billing.
+“Invalid Interval. The 'every' value must be the only value.”   | You sent both, an “every” interval and a list of custom dates | Create Recurring Billing.
+“Invalid Interval/IntervalValue”    | You provided an invalid combination of the interval and its values.   | Create Recurring Billing.
+“An error occurred while parsing the CustomDates”   | At least one of the custom dates you provided is not properly formatted   | Create Recurring Billing.
+“There is a date in the CustomDates smaller than the StartDate” | At least one of the custom dates you provided is previous to the StartDate you provided.|     Create Recurring Billing.
+“The EndDate must be greater than the greatest CustomDate”  | At least one of the custom dates you provided is posterior to the EndDate you provided.   | Create Recurring Billing.
+“EndDate must be submitted for CustomDates” | You provided a list of CustomDates but not an EndDate | Create Recurring Billing.
+“Invalid InertervalValue: this interval does not allow values”  | You selected an interval that does not require interval values.   | Create Recurring Billing.
+“Invalid Interval, you must explicit an IntervalValue”  | You selected an interval that requires IntervalValue and you did not send it. | Create Recurring Billing.
+“Invalid Interval”  | You sent a wrong Interval name.   | Create Recurring Billing.
+“End Date must be after start date” | You sent an End Date that is posterior to the Start Date you sent | Create Recurring Billing.
+“The Start Date cannot be earlier than today”   | You sent a Start Date previous to the current date.   | Create Recurring Billing.
+“Just one of End Date or Payment Count values are required, not both”   | You sent both “EndDate” and “PaymentCount”. Please send one or the other one, but not the both together.  | Create Recurring Billing.
+“Either one of End Date or Payment Count values are needed” | You didn’t send “EndDate” neither “PaymentCount”. Please send at least one of them.   | Create Recurring Billing.
+“The Payment Count value must be greater than 0”    | You sent PaymentCount with a value equal or less than 0   | Create Recurring Billing.
+“The current status of the Recurring Billing is final and does not allow any updates.”  | The Recurring Billing finished on scheduled, was deactivated or wasn’t created correctly so its status cannot be change.  | Update Recurring Billing.
+“Invalid Status”    | You sent a wrong status name. | Any Update endpoint.
+“Invalid Amount, it cannot be 0. If you wish to cancel the Recurring Billing, set the status to Deactivated”    | You sent Amount with a 0 value.   | Update Recurring Billing.
+“A database related error occurred B.RBB.04”    | Something went wrong when trying to retrieve the scheduled payments. Please contact support.  | Get Recurring Billing.
+“Either the SaleGuid or SaleReferenceNumber are required”   | You didn’t send SaleGuid neither SaleReferenceNumber. Please send one of them.    | Create Return.
+“You can't return a sale run more than 180 days ago”    | You attempted to return a sale that was run 180 days ago. | Create Return.
+“The Return Amount must be greater than zero”   | You sent Amount with a value equal or less than 0 | Create Return.
+“Original Amount exceeded”  | You attempted to return an amount greater than the original sale amount   | Create Return.
+“Sale has been voided”  | You attempted to return a voided sale.    | Create Return.
+“Sale has not been settled” | You attempted to return a sale of which batch has not been closed.    | Create Return.
+“The referenced Sale and this Return devices are not from the same MerchantAccount” | You sent a device guid belonging to a merchant processor account different from the one where the sale was run.   | Create Return.
+“The current invoice status does not allow a payment”   | Invoice was already paid, cancelled or has not been sent yet so it cannot be paid.    | Create Sale.
+“The sale amount does not match the invoice amount” | You sent and Invoice Guid, but the sale amount does not match the amount of that invoice. | Create Sale.
+“The calculated amount after Discount and/or ServiceFee and GrossAmount does not match the Amount value”    | You sent GrossAmount and Discount and/or ServiceFee, but the amount you sent does not match the result of Amount=GrossAmount-Discount+ServiceFee  | Create Sale.
+“If Discount and/or ServiceFee are submitted, the GrossAmount value is required”    | You sent Discount and or ServiceFee but you didn’t send GrossAmount.  | Create Sale.
+“Unable to find the device where the original sale was run.”  | You’re trying to charge a fee (or to reattempt a sale) over sale we cannot find the device where it ran. Please contact support.  | Charge Fee, Reattempt sale.
+“There are no active Fee Charger devices for your Merchant Processor Account”   | You’re trying to charge a fee but you haven’t setup a Fee Charger device yet. | Charge Fee.
+“Unable to charge fee for sale” | System was not able to charge the fee for the selected sale for some unknown reason. Please contact support.  | Charge Fee.
+“Unable to run sale again”  | System was not able to run the selected sale again for some unknown reason. Please contact support.   | Reattempt sale.
+“Original Sale not found”   | You sent an invalid Sale Guid | Reattempt sale.
+“Card for original Sale not found”  | We were not able to find the card used on the original sale. Please contact support.  | Reattempt sale.
+“Tax Rate submitted without declaring Tax Type” | You sent TaxRate but not TaxType. | Create Sale, Create AuthOnly, Create Capture.
+“Tax Rate submitted without declaring Tax Amount”   | You sent TaxRate but not TaxAmount.   | Create Sale, Create AuthOnly, Create Capture.
+“An error occurred while saving the EnhancedData”   | Something went wrong when trying to save tax information. Please contact support. | Create Sale, Create AuthOnly, Create Capture.
+“An error occurred while retrieving the EnhancedData”   | Something went wrong when trying to get tax information. Please contact support.  | Get Sale, Get AuthOnly, Get Capture.
+“The underlying Sale was not processed correctly. A Tip Adjustment cannot be made”  | You attempted to add a tip to a sale that didn’t run successfully.    | Create Tip Adjustment.
+“The TipAdjustment could not be processed correctly B.TA.C01”   | Something went wrong when trying to add the tip to the sale. Please contact Support.  | Create Tip Adjustment.
+“The Sale belongs to a closed batch. Tip Adjustments can only be made on open batches B.TA.C02” | You attempted to create a tip for a sale that is already settled. | Create Tip Adjustment.
+“Sale not found B.TA.C03”   | You sent an invalid Sale Guid | Create Tip Adjustment.
+“Invalid Device GUID B.TA.C04”  | You sent an invalid Device Guid.  | Create Tip Adjustment.
+“Card Verification does not allow Swiped requests. B.VB.C06”    | You sent track1 and/or track2. Please send a keyed card.  | Create Verify.
+“Card Verification does not allow EMV requests. B.VB.C07”   | You sent EMV data. Please send a keyed card.  | Create Verify.
+“There is no card match for the given Token. B.VB.C01”  | You sent a tokenized card but we were not able to find the original card number.  | Create Verify.
+“The Verify could not be processed correctly. B.VB.C05” | The Verify didn’t run successfully for an unknown reason. Please contact support. | Create Verify.
+“One of SaleGuid, AuthOnlyGuid, ReturnGuid, SaleReferenceNumber, AuthOnlyReferenceNumber or ReturnReferenceNumber fields is required”   | You didn’t say any Guid or Reference Number of the transaction you want to void.  | Create Void.
+“Only one of SaleGuid, AuthOnlyGuid, ReturnGuid, SaleReferenceNumber, AuthOnlyReferenceNumber or ReturnReferenceNumber fields can be accepted”  | You sent more than one Guid belonging to different kind of transactions.  | Create Void.
+“The AuthOnly cannot be voided because it has been captured already”    | You attempted to void an AuthOnly that has been already captured. Please try voiding the Sale generated instead.  | Create Void.
+“No device found for the underlying transaction”    | No active device was found for the transaction you’re trying to void. | Create Void.
+“Sale cannot be voided because it was not processed”    | You attempted to void a sale that didn’t run successfully.  | Create Void.
+“AuthOnly cannot be voided because it was not processed”    | You attempted to void an auth only that didn’t run successfully.    | Create Void.
+“Return cannot be voided because it was not processed”  | You attempted to void a return that didn’t run successfully.    | Create Void.
+“Transaction already settled”   | You attempted to void a transaction of which batch has already been closed  | Create Void.
+“No open batch available”   | For some reason, there is no open batch to process your transaction. Please contact support.    | Any Create Transaction endpoint.
+“Expiration date is required if the Card number is being sent. B.CB.GS01”  |  You sent a Card Number but no expiration date.  | Create Sale, Create AuthOnly, Create Recurring Billing, Create Verify.
+“Expiration date is required if the Card is being swiped. B.CB.GS02”    | You sent track1 and/or track2 but no expiration date.   | Create Sale, Create AuthOnly.
+“The current Merchant Processor Account does not allow Swiped transactions. B.CB.GS03”  | You provided a Device Guid that belongs to a Merchant Processor Account that does not allow swiped transactions. Please try with a different device Guid.   | Create Sale, Create Auth Only.
+“The current Merchant Processor Account does not allow EMV transactions. B.CB.GS04” | You provided a Device Guid that belongs to a Merchant Processor Account that does not allow EMV transactions. Please try with a different device Guid.  | Create Sale, Create Auth Only.
+“For EMV, required fields are EMVTags and ExpirationDate B.CB.GS05” | You’re missing either EmvTags or ExpirationDate fields (or both) when trying to run an EMV transaction. | Create Sale, Create Auth Only.
+“Tags missing B.CB.GS06”    | You’re missing at least one required tag for an EMV transaction.    | Create Sale, Create Auth Only.
+“Unexpected error: Card without token.”|  We were not able to tokenize the card. Please contact support.  | Create Sale, Create AuthOnly, Create Recurring Billing, Create Verify.
+“The Card tokenization could not be processed.”|  Processor were not able to tokenize the card. Please contact support.   | Create Sale, Create AuthOnly, Create Recurring Billing, Create Verify.
+“Card number, track1data or track2data missing” | You didn’t say any of cardNumber, track1data or track2data. Please provide at least one of them.  | Create Sale, Create AuthOnly, Create Recurring Billing, Create Verify.
+“Invalid DriverLicenseState name”   | You provided a wrong short name for Driver License State  | Create Bank Clearing, Create Bank Account.
+“As a Credit Card device, the ProcessorId, ProcessorOperatingUserId and ProcessorPassword data are required.”   | You’re missing at least one of ProcessorId, ProcessorOperating UserId or ProcessorPassword    | Create Device.
+“As an ACH device, the ProcessorLocationId data is required.”   | You’re missing ProcessorLocationId    | Create Device.
+“As an ACH device, the TerminalNumber data is required.”    | You’re missing TerminalNumber.    | Create Device.
+“Only one Fee Charger active device is allowed per Merchant Processor Account”  | You’re trying to create a device with FeeCharger=true for a Merchant Processor Account that already has an active Fee Charger Device  | Create Device.
+“Only one Mobile active device is allowed per Merchant Processor Account”   | You’re trying to create a device with IsMobile=true for a Merchant Processor Account that already has an active Mobile Device.    | Create Device.
+“In order to create a Virtual Terminal, the Merchant Processor Account where you're attempting to create this device must have setup an Auto Close Batch time.”|    You’re trying to create a device with IsVirtualTerminal=true for a Merchant Processor Account that hasn’t set an Auto Close Batch time yet. | Create Device.
+“The processor failed to return the Device Parameters. B.DB.04” | Processor was not able to return the device data. Please contact support. | Create Device.
+“An error occurred while requesting the processor parameters for this device. B.DB.02”  | System was not able retrieve device data from the processor. Please contact support.  | Create Device.
+“An error occurred while requesting the processor parameters for this device. B.DB.03”  | Something went wrong when system sent device parameters to processor. Please contact support. | Create Device.
+“Device updated. Device status changed to Paused because of an error.”  | Device was updated, but something went wrong so it was paused. Please contact support.|   Create Device.
+“There are no active Fee Charger devices for your Merchant Processor Account”   | No active device with FeeCharger=true was found.  | Charge Fee.
+“checkIpIsAllowed failed to check if endpoint is allowed to be run from IP” | You tried to run an endpoint that is not allowed to be run from your IP address.|     Protected endpoints.
+“The user does not have permission to do this”  | You attempted to run an endpoint that is not allowed for your user profile.   | Any endpoint.
+“A server error has occurred. The operation could not be finished.” | A general error occurred. Please contact support. | Any endpoint.
+“Hosted Payment Page Request expired”   | You attempted to see the preview or to confirm the transaction of a Hosted Payment Page request of which token has already expired.   | HostedPaymentPageRequests – Get Preview, HostedPaymentPageRequests – Confirm Transaction
+“Hosted Payment Page Request TempToken already used”    | You attempted to see the preview or to confirm the transaction of a Hosted Payment Page request of which token has already been used. | HostedPaymentPageRequests – Get Preview, HostedPaymentPageRequests – Confirm Transaction
+“SendDate cannot be earlier than today” | You sent a SendDate previous to current date. | Create Invoice.
+“PaymentDate cannot be earlier than today”  | You sent a PaymentDate previous to CurrentDate    | Create Invoice.
+“Send Status not allowed”   | You sent a SendSatus different from “Draft” or “Scheduled To be Sent” | Create Invoice.
+“Invalid SendStatus”    | You sent a wrong SendStatus   | Create Invoice.
+“Invalid PaymentTerm”   | You sent a wrong PaymentTerm  | Create Invoice.
+“Forbidden SendStatus”  | You’re trying to update the SendStatus of an invoice that has been already sent and cannot be updated.    | Update Invoice.
+“Invalid PaymentStatus” | You sent a wrong PaymentStatus    | Update Invoice.
+“A database related error occurred B.Iv.01” | We were not able to retrieve the invoice because of a database error. Plase contact support.  | Get Invoice
+“The current invoice status does not allow modifications”   | Invoice has been already sent and cannot be updated.  | Update Invoice, Update Invoice Detail
+“The current detail is deleted, no changes are allowed” | Invoice Detail has been deleted and cannot be updated.    | Update Invoice Detail.
+“A database related error occurred B.IvD.01”    | Invoice Detail or Invoice Reminder could not be retrieved because of a database error. Please contact support. | Get Invoice Detail, Get Invoice Reminder.
+“For a custom reminder, date is required”   | You sent a customized reminder but you didn’t include the reminder’s date.    | Create Invoice Reminder.
+“The current invoice payment status does not allow a new reminder”  | Invoice is already paid and a new reminder cannot be created. | Create Invoice Reminder.
+“Reminder date cannot be earlier than send date”    | You attempted to generate a reminder of which date is previous to the send date of the invoice.   | Create Invoice Reminder.
+“Reminder date cannot be earlier than today”    | You attempted to generate a reminder of which date is previous to current date.   | Create Invoice Reminder.
+“For this invoice there is an active reminder for this date already”    | You attempted to generate a reminder of which date is the same one another active reminder for the same invoice has.  | Create Invoice Reminder.
+“The reminder is completed, it cannot be updated”   | You’re trying to update a reminder that has already been executed.    | Update Invoice Reminder.
+“Days not specified”    | Something went wrong when trying to calculate the date of the reminder. Please try with a different value.    | Create Invoice Reminder, Update Invoice Reminder.
+“Invalid Parent Iso Number” | You provided a wrong Iso Number for ParentIso | Create Iso
+“Iso Fees and Discount rate can be null or zero, but cannot be negative”    | You sent a negative amount for at least one of the fees.  | Create Iso
+“User does not have the Merchant Admin role assigned.”  | You assigned as merchant’s admin a user that does not have the Merchant Admin Role    | Create Merchant
+“Merchant Processor Account Fees and Discount rate can be null or zero, but cannot be negative” | You sent a negative amount for at least one of the fees.  | Create Merchant Processor Account
+“AutoClose is available for Credit Card only”   | You attempted to set “AutoClose=true” for an ACH Merchant Processor Account.  | Create Merchant Processor Account, Update Merchant Processor Account
+“Subisos cannot setup fees lower than those established by its Parent Iso”  | You attempted to create or update a merchant processor account and setup fees lower than the ones your parent iso charges.    | Create Merchant Processor Account, Update Merchant Processor Account
+“Invalid context. Allowed values are: Invoice, i, RecurringBilling, rb” | You sent an invalid context   | Get Merchant Product, Get Merchant Product List
+“A database related error occurred B.MPB.01”    | Something went wrong at the database level when trying to retrieve something related with merchant product.|      Get Merchant Product, Get Merchant Product List, Get Merchant Product List Detail.
+“The authenticated user does not have permission to perform this operation.”    | Your user role does not have permission to run the endpoint you’re pointing to. Please try with a different endpoint or contact support to get a new role.    | Any endpoint.
+“Invalid State name”    | You sent a wrong US State short name. | Any endpoint.
+“Invalid Invoice Customer”  | You sent a wrong InvoiceCustomer Guid | Create Invoice, Update Invoice.
+“Iso number not found”  | You sent a wrong Iso Number   | Register Account
+“Unable to remove Merchant Admin Profile. User is still admin of the following merchants:”  | You’re trying to remove the Merchant Admin profile to a user who is still admin of some merchants. Remove the user from the admin list on each of the merchants listed    | Update User Role
+“Unable to decode the Model”    | You sent a wrong Json for the endpoint you pointed to | Any endpoint.
+“Invalid ModelState”    | You sent a wrong Json for the endpoint you pointed to | Any endpoint.
+“NoResultFound204”  | You sent a search or called a Get All endpoint that generated no results  | Any get all endpoint, Any search endpoint.
+“Unable to reach entity”    | You sent an invalid Guid  | Any get endpoint.
+“Wrong emailType”   | You sent an invalid e-mail address    | Resend Email.
+“Invalid TempToken” | You sent a wrong temporal token   | HostedPaymentPageRequests – Confirm Transaction
+“Operation is only available for Sandbox url”   | You attempted to create a user using an endpoint only available for Sandbox   | Create User
+“Iso is not active.”    | You sent an Iso Number belonging to an inactive iso   | Register Account.
+“Username does not exist”   | You sent a username that does not exist at all    | Reset Password Request.
+“Key expired”   | You attempted to reset a password using a key that is expired.    | Reset Password.
+“Key does not exist”    | You attempted to reseat a password using a key that does not exist at all.    | Reset Password.
+“Invalid State” | You sent a wrong US State short name. | Any endpoint.
+“Invalid Status”    | You sent a wrong status name. | Any endpoint.
