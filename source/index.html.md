@@ -8290,3 +8290,4775 @@ merchantGuid | Merchant’s guid to get
 <aside class="success">
 Remember you will need to use an authentication token or the API Key in the header request for every transaction.
 </aside>
+
+# Invoice
+
+## Create invoice
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Invoice
+    {
+        public static void CreateInvoice()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var invoice = new
+                {
+                    MerchantGuid = "24639b5f-f881-45dc-966c-4beece954e6c",
+                    InvoiceCustomerGuid = "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+                    InvoiceNumber = "000006",
+                    OrderNumber = "000006",
+                    PaymentTerm = "Due on Receipt",
+                    DueDate = "11/26/2020",
+                    Details = new Detail[]
+                    {
+                        new Detail{
+                             ItemDescription = "Wine Malbec",
+                             ItemName = "Wine Malbec",
+                             Rate = 14.78,
+                             Quantity = 8
+                        },
+                        new Detail{
+                             ItemDescription = "Rum",
+                             ItemName = "Rum",
+                             Rate = 9.85,
+                             Quantity = 4
+                        },
+                        new Detail{
+                             ItemDescription = "Brandy",
+                             ItemName = "Brandy",
+                             Rate = 11.80,
+                             Quantity = 2
+                        },
+                        new Detail{
+                             ItemDescription = "Cigars",
+                             ItemName = "Cigars",
+                             Rate = 44.89,
+                             Quantity = 3
+                        }
+                    },
+                    DiscountType = "Fixed",
+                    DiscountValue = 5.00,
+                    TaxZip = "10016",
+                    TaxAmount = 27.5932625,
+                    TaxRate = 8.875,
+                    Note = "For september services",
+                    TermsAndConditions = "The ones you accepted when you clicked two pages ago",
+                    SendStatus = "Scheduled To be Sent",
+                    SendDate = "11/25/2020",
+                    InvoiceRecipientEmail = "maxduplessy@mailinator.com",
+                    OtherRecipients = "maxduplessy@mailinator.com, maxduplessy123@mailinator.com",
+                    SendBySMS = true,
+                    SendToPhoneNumber = "9174355176",
+                    SendToOthersNumber ="6384910738, 9174607489"
+                };
+
+                string json = JsonConvert.SerializeObject(invoice);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "invoiceCustomerGuid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+    "invoiceNumber": "000006",
+    "orderNumber": "000006",
+    "paymentTerm": "Due on Receipt",
+    "dueDate": "11/26/2020",
+    "details": [
+        {
+            "itemName": "Wine Malbec",
+            "itemDescription": "",
+            "quantity": 8,
+            "rate": "14.78"
+        },
+        {
+            "itemName": "Rum",
+            "itemDescription": "",
+            "quantity": 4,
+            "rate": "9.85"
+        },
+        {
+            "itemName": "Brandy",
+            "itemDescription": "",
+            "quantity": 2,
+            "rate": "11.80"
+        },
+        {
+            "itemName": "Cigars",
+            "itemDescription": "",
+            "quantity": 3,
+            "rate": "44.89"
+        }
+    ],
+    "discountType": "Fixed",
+    "discountValue": "5",
+    "taxZip": "10016",
+    "taxRate": 8.875,
+    "taxAmount": 27.5932625,
+    "note": "For september services",
+    "termsAndConditions": "The ones you accepted when you clicked two pages ago",
+    "sendStatus": "Scheduled To be Sent",
+    "sendDate": "11/25/2020",
+    "invoiceRecipientEmail": "maxduplessy@mailinator.com",
+    "sendToPhoneNumber": "9887555656",
+    "sendBySMS": true
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+    "timeStamp": "2020-11-25T09:54:46.21-06:00",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "invoiceCustomerGuid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+    "sendDate": "2020-11-25T00:00:00",
+    "sendStatus": "Scheduled To be Sent",
+    "paymentStatus": "Scheduled To be Sent",
+    "invoiceRecipientEmail": "maxduplessy@mailinator.com",
+    "paymentTerm": "Due on Receipt",
+    "dueDate": "2020-11-25T09:54:46.2",
+    "invoiceNumber": "000006",
+    "orderNumber": "000006",
+    "amountSubTotal": 315.91,
+    "amountDueTotal": 338.50,
+    "remainingBalance": 0.0,
+    "amountDiscounted": 5.00,
+    "discountValue": 5.00,
+    "discountType": "Fixed",
+    "taxRate": 8.87,
+    "taxAmount": 27.59,
+    "taxZip": "10016",
+    "note": "For september services",
+    "termsAndConditions": "The ones you accepted when you clicked two pages ago",
+    "extensionHostedPaymentPageRequestToken": "00000000-0000-0000-0000-000000000000",
+    "details": [
+        {
+            "guid": "f2ce15be-a6b7-4106-8660-ffd88e4219bc",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Wine Malbec",
+            "itemDescription": "",
+            "rate": 14.78,
+            "quantity": 8,
+            "amount": 118.24,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 118.24
+        },
+        {
+            "guid": "c9d70ca3-a571-4f5b-bb86-d52b9e28c298",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Rum",
+            "itemDescription": "",
+            "rate": 9.85,
+            "quantity": 4,
+            "amount": 39.40,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 39.40
+        },
+        {
+            "guid": "23074f19-969f-48d0-b2d4-99ffd2884001",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Brandy",
+            "itemDescription": "",
+            "rate": 11.80,
+            "quantity": 2,
+            "amount": 23.60,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 23.60
+        },
+        {
+            "guid": "0ac11bf0-1e81-4059-bb79-41e46ecbf4c1",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Cigars",
+            "itemDescription": "",
+            "rate": 44.89,
+            "quantity": 3,
+            "amount": 134.67,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 134.67
+        }
+    ],
+    "reminders": [
+        {
+            "guid": "21b7cce9-8940-47d0-b2f9-1d5c3cbe194c",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "reminderType": "5 days after due date",
+            "isActive": true,
+            "isCompleted": false,
+            "reminderDate": "2020-11-30T09:54:46.2"
+        }
+    ],
+    "merchant": {
+        "guid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "mid": "888000002849",
+        "allowOpenButton": false,
+        "recurringBillingSettings": [
+            {
+                "numReAttempt": 1,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 2,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 3,
+                "nameDayOfWeek": "Friday"
+            }
+        ],
+        "dba": "326Nothing",
+        "legalName": "326Nothing",
+        "adminUserGuid": "fad491cb-ac86-4250-ab34-ac8be77ee659",
+        "email": "326Nothing@mailinator.com",
+        "phone": "5656566886",
+        "address1": "Belgrano 383",
+        "city": "New York",
+        "state": "NY",
+        "zipcode": "10016",
+        "logoUrl": "https://res.cloudinary.com/choice/image/upload/v1516126617/uxuxkm3odb6lltibyeyj.png",
+        "defaultAllowsSurchargeOtherDevice": false,
+        "reAttemptRB": true,
+        "logoName": "mariano.png",
+        "status": "Merchant - Active",
+        "merchantOwners": [
+            {
+                "guid": "04ba4b19-e671-4c53-9951-1647b8d2fffa",
+                "firstName": "max",
+                "lastName": "tomassi",
+                "email": "Alpinstar@mailinator.com",
+                "phone": "5454354455",
+                "address1": "Belgrano 383",
+                "city": "new york",
+                "state": "NY",
+                "zipcode": "10016",
+                "country": "US",
+                "status": "MerchantOwner - Active"
+            }
+        ]
+    },
+    "invoiceCustomer": {
+        "guid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+        "merchantGuid": "00000000-0000-0000-0000-000000000000",
+        "customerCode": "NA1530",
+        "companyName": "Incutex",
+        "firstName": "Max",
+        "lastName": "Tomassi",
+        "address1": "Belgrano 383",
+        "zip": "10016",
+        "city": "New York",
+        "state": "NY",
+        "country": "United States",
+        "province": "",
+        "personalPhone": "",
+        "email": "maxduplessy@mailinator.com",
+        "invoiceNumber": "000001"
+    },
+    "sendBySMS": true,
+    "sendToPhoneNumber": "9887555656",
+    "recurringBilling": []
+}
+```
+
+This endpoint creates a invoice.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Invoice`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant's Guid.
+InvoiceCustomerGuid | string | Mandatory | InvoiceCustomer's Guid.
+InvoiceNumber | string |  Mandatory | Invoice Number.
+OrderNumber | string |  Optional | Order number. Length = 30.
+PaymentTerm | string | Optional | The term of payments.<br><br>Allowed values:<br><br>**1. Custom**<br>**2. Due on Receipt** <br>**3. Due end of month** <br>**4. Due end of next month** <br>**5. Net 15** <br>**6. Net 30** <br>**7. Net 45** <br>**8. Net 60**
+DueDate | date | Optional | Due Date.<br><br>Allowed format:<br><br>MM-DD-YYYY.<br>For example: 05-30-2018.
+DueDateSpecial | date | Optional | Due Date for today.<br><br>Allowed format:<br><br>MM-DD-YYYY.<br>For example: 05-30-2018.
+DiscountType | string | Optional | Discount Type.<br><br>Allowed values:<br><br>**1. Fixed**<br>**2. Percentage**
+DiscountValue | decimal | Optional | Discount Value.
+TaxZip | string | Optional | Tax Zip.
+TaxAmount | decimal | Optional | Tax Amount.
+TaxRate | decimal | Optional | Tax Rate.
+Note | string | Optional | Note.
+TermsAndConditions | string | Optional | Terms And Conditions.
+SendStatus | string | Optional | Send Status.<br><br>Allowed values:<br><br>**1. Draft**<br>**2. Scheduled To be Sent** <br>**3. Scheduled To be SentEMAIL** <br>**4. Scheduled To be SentSMS**
+SendDate | date | Optional | Send Date.<br><br>Allowed format:<br><br>MM-DD-YYYY.<br>For example: 05-30-2018.
+InvoiceRecipientEmail | string | Optional | Valid email address.
+SendBySMS | boolean | Optional | True or False.
+SendToPhoneNumber | string | Optional | Phone number. The phone number must be syntactically correct. For example, 4152345678.
+Details | object[] | Mandatory | Details.
+ |  | 
+**Details** | array of detail | 
+ItemDescription | string | Optional | Item Description.
+ItemName | string | Optional | Item Name.
+Rate | decimal | Optional | Rate.
+Quantity | integer | Optional | Quantity.
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Update invoice
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Invoice
+    {
+        public static void UpdateInvoice()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/2541692d-958f-46b7-8ca7-a127016ea3b6");
+                request.ContentType = "text/json";
+                request.Method = "PUT";
+
+                var invoice = new
+                {
+                    OrderNumber = "000006",
+                    PaymentTerm = "Due on Receipt",
+                    DueDate = "11/26/2020",
+                    DiscountType = "Fixed",
+                    DiscountValue = "5",
+                    TaxZip = "10016",
+                    TaxRate = 8.875,
+                    TaxAmount = 27.5932625,
+                    Note = "For september services",
+                    TermsAndConditions = "The ones you accepted when you clicked two pages ago",
+                    SendStatus = "Scheduled To be Sent",
+                    SendDate = "11/25/2020",
+                    InvoiceRecipientEmail = "maxduplessy@mailinator.com",
+                    SendToPhoneNumber = "9887555656",
+                    SendBySMS = true
+                };
+
+                string json = JsonConvert.SerializeObject(invoice);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "OrderNumber": "000006",
+    "PaymentTerm": "Due on Receipt",
+    "DueDate": "11/26/2020",
+    "DiscountType": "Fixed",
+    "DiscountValue": "5",
+    "TaxZip": "10016",
+    "TaxRate": 8.875,
+    "TaxAmount": 27.5932625,
+    "Note": "For september services",
+    "TermsAndConditions": "The ones you accepted when you clicked two pages ago",
+    "SendStatus": "Scheduled To be Sent",
+    "SendDate": "11/25/2020",
+    "InvoiceRecipientEmail": "maxduplessy@mailinator.com",
+    "SendToPhoneNumber": "9887555656",
+    "SendBySMS": true
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+    "timeStamp": "2020-11-25T09:54:46.21-06:00",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "invoiceCustomerGuid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+    "sendDate": "2020-11-25T00:00:00",
+    "sendStatus": "Scheduled To be Sent",
+    "paymentStatus": "Unpaid",
+    "invoiceRecipientEmail": "maxduplessy@mailinator.com",
+    "paymentTerm": "Due on Receipt",
+    "dueDate": "2020-11-25T13:21:30.91",
+    "invoiceNumber": "000006",
+    "orderNumber": "000006",
+    "amountSubTotal": 315.91,
+    "amountDueTotal": 338.49,
+    "remainingBalance": 0.0,
+    "amountDiscounted": 5.00,
+    "discountValue": 5.00,
+    "discountType": "Fixed",
+    "taxRate": 8.87,
+    "taxAmount": 27.59,
+    "taxZip": "10016",
+    "note": "For september services",
+    "termsAndConditions": "The ones you accepted when you clicked two pages ago",
+    "extensionHostedPaymentPageRequestToken": "00000000-0000-0000-0000-000000000000",
+    "details": [
+        {
+            "guid": "f2ce15be-a6b7-4106-8660-ffd88e4219bc",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Wine Malbec",
+            "itemDescription": "",
+            "rate": 14.78,
+            "quantity": 8,
+            "amount": 118.24,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 118.24
+        },
+        {
+            "guid": "c9d70ca3-a571-4f5b-bb86-d52b9e28c298",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Rum",
+            "itemDescription": "",
+            "rate": 9.85,
+            "quantity": 4,
+            "amount": 39.40,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 39.40
+        },
+        {
+            "guid": "23074f19-969f-48d0-b2d4-99ffd2884001",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Brandy",
+            "itemDescription": "",
+            "rate": 11.80,
+            "quantity": 2,
+            "amount": 23.60,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 23.60
+        },
+        {
+            "guid": "0ac11bf0-1e81-4059-bb79-41e46ecbf4c1",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Cigars",
+            "itemDescription": "",
+            "rate": 44.89,
+            "quantity": 3,
+            "amount": 134.67,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 134.67
+        }
+    ],
+    "reminders": [
+        {
+            "guid": "21b7cce9-8940-47d0-b2f9-1d5c3cbe194c",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "reminderType": "5 days after due date",
+            "isActive": true,
+            "isCompleted": false,
+            "reminderDate": "2020-11-30T13:21:30.91"
+        }
+    ],
+    "merchant": {
+        "guid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "mid": "888000002849",
+        "allowOpenButton": false,
+        "recurringBillingSettings": [
+            {
+                "numReAttempt": 1,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 2,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 3,
+                "nameDayOfWeek": "Friday"
+            }
+        ],
+        "dba": "326Nothing",
+        "legalName": "326Nothing",
+        "adminUserGuid": "fad491cb-ac86-4250-ab34-ac8be77ee659",
+        "email": "326Nothing@mailinator.com",
+        "phone": "5656566886",
+        "address1": "Belgrano 383",
+        "city": "New York",
+        "state": "NY",
+        "zipcode": "10016",
+        "logoUrl": "https://paybugstagestorage.blob.core.windows.net/images/C:%5Cinetpub%5CPayBugStage%5CApp_Data%5CBodyPart_4504fad2-18b5-48dc-9e91-20f81647485e",
+        "defaultAllowsSurchargeOtherDevice": false,
+        "reAttemptRB": true,
+        "logoName": "mariano.png",
+        "status": "Merchant - Active",
+        "merchantOwners": [
+            {
+                "guid": "04ba4b19-e671-4c53-9951-1647b8d2fffa",
+                "firstName": "max",
+                "lastName": "tomassi",
+                "email": "Alpinstar@mailinator.com",
+                "phone": "5454354455",
+                "address1": "Belgrano 383",
+                "city": "new york",
+                "state": "NY",
+                "zipcode": "10016",
+                "country": "US",
+                "status": "MerchantOwner - Active"
+            }
+        ]
+    },
+    "invoiceCustomer": {
+        "guid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+        "merchantGuid": "00000000-0000-0000-0000-000000000000",
+        "customerCode": "NA1530",
+        "companyName": "Incutex",
+        "firstName": "Max",
+        "lastName": "Tomassi",
+        "address1": "Belgrano 383",
+        "zip": "10016",
+        "city": "New York",
+        "state": "NY",
+        "country": "United States",
+        "province": "",
+        "personalPhone": "",
+        "email": "maxduplessy@mailinator.com",
+        "invoiceNumber": "000001"
+    },
+    "sendBySMS": true,
+    "sendToPhoneNumber": "9887555656",
+    "recurringBilling": []
+}
+```
+
+This endpoint updates a invoice.
+
+### HTTP Request
+
+`PUT https://sandbox.choice.dev/api/v1/Invoice/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Invoice’s guid to update
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+OrderNumber | string |  Optional | Order number. Length = 30.
+PaymentTerm | string | Optional | The term of payments.<br><br>Allowed values:<br><br>**1. Custom**<br>**2. Due on Receipt** <br>**3. Due end of month** <br>**4. Due end of next month** <br>**5. Net 15** <br>**6. Net 30** <br>**7. Net 45** <br>**8. Net 60**
+DueDate | date | Optional | Due Date.<br><br>Allowed format:<br><br>MM-DD-YYYY.<br>For example: 05-30-2018.
+DiscountType | string | Optional | Discount Type.<br><br>Allowed values:<br><br>**1. Fixed**<br>**2. Percentage**
+DiscountValue | decimal | Optional | Discount Value.
+TaxZip | string | Optional | Tax Zip.
+TaxAmount | decimal | Optional | Tax Amount.
+TaxRate | decimal | Optional | Tax Rate.
+Note | string | Optional | Note.
+TermsAndConditions | string | Optional | Terms And Conditions.
+SendStatus | string | Optional | Send Status.<br><br>Allowed values:<br><br>**1. Draft**<br>**2. Scheduled To be Sent** <br>**3. Scheduled To be SentEMAIL** <br>**4. Scheduled To be SentSMS**
+SendDate | date | Optional | Send Date.<br><br>Allowed format:<br><br>MM-DD-YYYY.<br>For example: 05-30-2018.
+InvoiceRecipientEmail | string | Optional | Valid email address.
+SendBySMS | boolean | Optional | True or False.
+SendToPhoneNumber | string | Optional | Phone number. The phone number must be syntactically correct. For example, 4152345678.
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Get invoice
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Invoice
+    {
+        public static void GetInvoice()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/2541692d-958f-46b7-8ca7-a127016ea3b6");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+    "timeStamp": "2020-11-25T09:54:46.21-06:00",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "invoiceCustomerGuid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+    "sendDate": "2020-11-25T00:00:00",
+    "sendStatus": "Scheduled To be Sent",
+    "paymentStatus": "Unpaid",
+    "invoiceRecipientEmail": "maxduplessy@mailinator.com",
+    "paymentTerm": "Due on Receipt",
+    "dueDate": "2020-11-25T13:21:30.91",
+    "invoiceNumber": "000006",
+    "orderNumber": "000006",
+    "amountSubTotal": 315.91,
+    "amountDueTotal": 338.49,
+    "remainingBalance": 0.0,
+    "amountDiscounted": 5.00,
+    "discountValue": 5.00,
+    "discountType": "Fixed",
+    "taxRate": 8.87,
+    "taxAmount": 27.59,
+    "taxZip": "10016",
+    "note": "For september services",
+    "termsAndConditions": "The ones you accepted when you clicked two pages ago",
+    "extensionHostedPaymentPageRequestToken": "e0b2ac6e-994c-4e65-888a-3cb3d1b7f974",
+    "extensionDisplayCreditCard": true,
+    "extensionDisplayAch": true,
+    "details": [
+        {
+            "guid": "f2ce15be-a6b7-4106-8660-ffd88e4219bc",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Wine Malbec",
+            "itemDescription": "",
+            "rate": 14.78,
+            "quantity": 8,
+            "amount": 118.24,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 118.24
+        },
+        {
+            "guid": "c9d70ca3-a571-4f5b-bb86-d52b9e28c298",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Rum",
+            "itemDescription": "",
+            "rate": 9.85,
+            "quantity": 4,
+            "amount": 39.40,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 39.40
+        },
+        {
+            "guid": "23074f19-969f-48d0-b2d4-99ffd2884001",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Brandy",
+            "itemDescription": "",
+            "rate": 11.80,
+            "quantity": 2,
+            "amount": 23.60,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 23.60
+        },
+        {
+            "guid": "0ac11bf0-1e81-4059-bb79-41e46ecbf4c1",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Cigars",
+            "itemDescription": "",
+            "rate": 44.89,
+            "quantity": 3,
+            "amount": 134.67,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 134.67
+        }
+    ],
+    "reminders": [
+        {
+            "guid": "21b7cce9-8940-47d0-b2f9-1d5c3cbe194c",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "reminderType": "5 days after due date",
+            "isActive": true,
+            "isCompleted": false,
+            "reminderDate": "2020-11-30T13:21:30.91"
+        }
+    ],
+    "merchant": {
+        "guid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "mid": "888000002849",
+        "allowOpenButton": false,
+        "recurringBillingSettings": [
+            {
+                "numReAttempt": 1,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 2,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 3,
+                "nameDayOfWeek": "Friday"
+            }
+        ],
+        "dba": "326Nothing",
+        "legalName": "326Nothing",
+        "adminUserGuid": "fad491cb-ac86-4250-ab34-ac8be77ee659",
+        "email": "326Nothing@mailinator.com",
+        "phone": "5656566886",
+        "address1": "Belgrano 383",
+        "city": "New York",
+        "state": "NY",
+        "zipcode": "10016",
+        "logoUrl": "https://paybugstagestorage.blob.core.windows.net/images/C:%5Cinetpub%5CPayBugStage%5CApp_Data%5CBodyPart_4504fad2-18b5-48dc-9e91-20f81647485e",
+        "defaultAllowsSurchargeOtherDevice": false,
+        "reAttemptRB": true,
+        "logoName": "mariano.png",
+        "status": "Merchant - Active",
+        "merchantOwners": [
+            {
+                "guid": "04ba4b19-e671-4c53-9951-1647b8d2fffa",
+                "firstName": "max",
+                "lastName": "tomassi",
+                "email": "Alpinstar@mailinator.com",
+                "phone": "5454354455",
+                "address1": "Belgrano 383",
+                "city": "new york",
+                "state": "NY",
+                "zipcode": "10016",
+                "country": "US",
+                "status": "MerchantOwner - Active"
+            }
+        ]
+    },
+    "invoiceCustomer": {
+        "guid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+        "merchantGuid": "00000000-0000-0000-0000-000000000000",
+        "customerCode": "NA1530",
+        "companyName": "Incutex",
+        "firstName": "Max",
+        "lastName": "Tomassi",
+        "address1": "Belgrano 383",
+        "zip": "10016",
+        "city": "New York",
+        "state": "NY",
+        "country": "United States",
+        "province": "",
+        "personalPhone": "",
+        "email": "maxduplessy@mailinator.com",
+        "invoiceNumber": "000001"
+    },
+    "sendBySMS": true,
+    "sendToPhoneNumber": "9887555656",
+    "recurringBilling": []
+}
+```
+
+This endpoint gets a invoice.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/Invoice/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Invoice’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+# Invoice Detail
+
+## Add invoice detail
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceDetail
+    {
+        public static void CreateInvoiceDetail()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/Detail");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var invoiceDetail = new
+                {
+                    InvoiceGuid = "4be52be2-bedf-4125-b7d5-2ed9ef8d6027",
+                    ItemDescription = "Sparkling Wine",
+                    Rate = 1.95,
+                    Quantity = 3
+                };
+
+                string json = JsonConvert.SerializeObject(invoiceDetail);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+	"invoiceGuid" : "2541692d-958f-46b7-8ca7-a127016ea3b6",
+	"ItemDescription":"Sparkling Wine",
+    "ItemName": "Sparkling Wine",
+	"Rate":1.95,
+	"Quantity": 3
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "965b4d54-d35d-414d-b0c9-991c6ca013e7",
+    "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+    "itemName": "Sparkling Wine",
+    "itemDescription": "Sparkling Wine",
+    "rate": 1.95,
+    "quantity": 3,
+    "amount": 5.85,
+    "isDeleted": false,
+    "discounType": null,
+    "discountedAmount": 0.00,
+    "finallyAmount": 5.85
+}
+```
+
+This endpoint add a invoice detail.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Invoice/Detail`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+InvoiceGuid | string | Mandatory | Invoice's Guid.
+ItemDescription | string | Mandatory | Item Description.
+ItemName | string | Optional | Item Name.
+Rate | decimal |  Mandatory | Rate.
+Quantity | integer |  Mandatory | Quantity.
+
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Create invoice details list
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceDetail
+    {
+        public static void CreateInvoiceDetailsList()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/Detail/all/2541692d-958f-46b7-8ca7-a127016ea3b6");
+                request.ContentType = "text/json";
+                request.Method = "PUT";
+
+                var invoiceDetailsList = new Detail[]
+                {
+                    new Detail{
+                         ItemDescription = "Red Wine",
+                         ItemName = "Red Wine",
+                         Rate = 14.78,
+                         Quantity = 8
+                    },
+                    new Detail{
+                         ItemDescription = "Purple Wine",
+                         ItemName = "Purple Wine",
+                         Rate = 9.85,
+                         Quantity = 4
+                    }
+                };
+
+                string json = JsonConvert.SerializeObject(invoiceDetailsList);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+[
+    {
+        "ItemDescription": "Red Wine",
+        "ItemName": "Red Wine",
+        "Rate": 1.95,
+        "Quantity": 3
+    },
+    {
+        "ItemDescription": "Purple Wine",
+        "ItemName": "Purple Wine",
+        "Rate": 7.55,
+        "Quantity": 1
+    }
+]
+```
+
+> Json Example Response:
+
+```json
+{
+    "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+    "timeStamp": "2020-11-25T09:54:46.21-06:00",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "invoiceCustomerGuid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+    "sendDate": "2020-11-25T00:00:00",
+    "sendStatus": "Scheduled To be Sent",
+    "paymentStatus": "Scheduled To be Sent",
+    "invoiceRecipientEmail": "maxduplessy@mailinator.com",
+    "paymentTerm": "Due on Receipt",
+    "dueDate": "2020-11-25T09:54:46.2",
+    "invoiceNumber": "000006",
+    "orderNumber": "000006",
+    "amountSubTotal": 315.91,
+    "amountDueTotal": 338.50,
+    "remainingBalance": 0.0,
+    "amountDiscounted": 5.00,
+    "discountValue": 5.00,
+    "discountType": "Fixed",
+    "taxRate": 8.87,
+    "taxAmount": 27.59,
+    "taxZip": "10016",
+    "note": "For september services",
+    "termsAndConditions": "The ones you accepted when you clicked two pages ago",
+    "extensionHostedPaymentPageRequestToken": "00000000-0000-0000-0000-000000000000",
+    "details": [
+        {
+            "guid": "23074f19-969f-48d0-b2d4-99ffd2884001",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Brandy",
+            "itemDescription": "",
+            "rate": 11.80,
+            "quantity": 2,
+            "amount": 23.60,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 23.60
+        },
+        {
+            "guid": "0ac11bf0-1e81-4059-bb79-41e46ecbf4c1",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Cigars",
+            "itemDescription": "",
+            "rate": 44.89,
+            "quantity": 3,
+            "amount": 134.67,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 134.67
+        },
+                {
+            "guid": "f2ce15be-a6b7-4106-8660-ffd88e4219bc",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Red Wine",
+            "itemDescription": "",
+            "rate": 14.78,
+            "quantity": 8,
+            "amount": 118.24,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 118.24
+        },
+        {
+            "guid": "c9d70ca3-a571-4f5b-bb86-d52b9e28c298",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Purple Wine",
+            "itemDescription": "",
+            "rate": 9.85,
+            "quantity": 4,
+            "amount": 39.40,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 39.40
+        }
+    ],
+    "reminders": [
+        {
+            "guid": "21b7cce9-8940-47d0-b2f9-1d5c3cbe194c",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "reminderType": "5 days after due date",
+            "isActive": true,
+            "isCompleted": false,
+            "reminderDate": "2020-11-30T09:54:46.2"
+        }
+    ],
+    "merchant": {
+        "guid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "mid": "888000002849",
+        "allowOpenButton": false,
+        "recurringBillingSettings": [
+            {
+                "numReAttempt": 1,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 2,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 3,
+                "nameDayOfWeek": "Friday"
+            }
+        ],
+        "dba": "326Nothing",
+        "legalName": "326Nothing",
+        "adminUserGuid": "fad491cb-ac86-4250-ab34-ac8be77ee659",
+        "email": "326Nothing@mailinator.com",
+        "phone": "5656566886",
+        "address1": "Belgrano 383",
+        "city": "New York",
+        "state": "NY",
+        "zipcode": "10016",
+        "logoUrl": "https://res.cloudinary.com/choice/image/upload/v1516126617/uxuxkm3odb6lltibyeyj.png",
+        "defaultAllowsSurchargeOtherDevice": false,
+        "reAttemptRB": true,
+        "logoName": "mariano.png",
+        "status": "Merchant - Active",
+        "merchantOwners": [
+            {
+                "guid": "04ba4b19-e671-4c53-9951-1647b8d2fffa",
+                "firstName": "max",
+                "lastName": "tomassi",
+                "email": "Alpinstar@mailinator.com",
+                "phone": "5454354455",
+                "address1": "Belgrano 383",
+                "city": "new york",
+                "state": "NY",
+                "zipcode": "10016",
+                "country": "US",
+                "status": "MerchantOwner - Active"
+            }
+        ]
+    },
+    "invoiceCustomer": {
+        "guid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+        "merchantGuid": "00000000-0000-0000-0000-000000000000",
+        "customerCode": "NA1530",
+        "companyName": "Incutex",
+        "firstName": "Max",
+        "lastName": "Tomassi",
+        "address1": "Belgrano 383",
+        "zip": "10016",
+        "city": "New York",
+        "state": "NY",
+        "country": "United States",
+        "province": "",
+        "personalPhone": "",
+        "email": "maxduplessy@mailinator.com",
+        "invoiceNumber": "000001"
+    },
+    "sendBySMS": true,
+    "sendToPhoneNumber": "9887555656",
+    "recurringBilling": []
+}
+```
+
+This endpoint create a invoice details list.
+
+### HTTP Request
+
+`PUT https://sandbox.choice.dev/api/v1/Invoice/Detail/all/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Invoice’s guid
+
+
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+ItemDescription | string | Mandatory | Item Description.
+Rate | decimal |  Mandatory | Rate.
+Quantity | integer |  Mandatory | Quantity.
+
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+# Invoice Reminder
+
+## Create invoice reminder
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceReminder
+    {
+        public static void CreateInvoiceReminder()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/Reminder");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var invoiceReminder = new
+                {
+                    InvoiceGuid = "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+                    ReminderType = "2 weeks after due date"
+                };
+
+                string json = JsonConvert.SerializeObject(invoiceReminder);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "InvoiceGuid" : "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+    "ReminderType" : "2 weeks after due date"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "a4e4278b-f2de-41d9-8da5-d0aabbf5a385",
+    "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+    "reminderType": "2 weeks after due date",
+    "isActive": true,
+    "isCompleted": false,
+    "reminderDate": "2019-08-08T00:00:00"
+}
+```
+
+This endpoint creates a invoice reminder.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Invoice/Reminder`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+InvoiceGuid | string | Mandatory | Invoice's Guid.
+ReminderType | string | Mandatory | Reminder Type.<br><br>Allowed values:<br><br>**1. X days before due date**<br>**2. 1 days before due date** <br>**3. 5 days before due date** <br>**4. 1 week before due date** <br>**5. 10 days before due date** <br>**6. 2 week before due date** <br><br>**7. X days after due date**<br>**8. 1 days after due date** <br>**9. 5 days after due date** <br>**10. 1 week after due date** <br>**11. 10 days after due date** <br>**12. 2 week after due date**
+ReminderDaysValue | byte | Optional | Reminder Days Value. Only with "X days before due date" or "X days after due date"
+
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Update invoice reminder
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceReminder
+    {
+        public static void UpdateInvoiceReminder()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/Reminder/a4e4278b-f2de-41d9-8da5-d0aabbf5a385/true");
+                request.ContentType = "text/json";
+                request.Method = "PUT";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response (PUT https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/true):
+
+```json
+{
+    "guid": "a4e4278b-f2de-41d9-8da5-d0aabbf5a385",
+    "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+    "reminderType": "2 weeks after due date",
+    "isActive": true,
+    "isCompleted": false,
+    "reminderDate": "2019-08-08T00:00:00"
+}
+```
+
+> Json Example Response (PUT https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/false):
+
+```json
+{
+    "guid": "a4e4278b-f2de-41d9-8da5-d0aabbf5a385",
+    "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+    "reminderType": "2 weeks after due date",
+    "isActive": false,
+    "isCompleted": false,
+    "reminderDate": "2019-08-08T00:00:00"
+}
+```
+
+This endpoint updates a invoice reminder.
+
+### HTTP Request
+
+`PUT https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/true`
+
+    or
+
+`PUT https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/false`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Reminder’s guid to update
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+## Get invoice reminder
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceReminder
+    {
+        public static void GetInvoiceReminder()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/Reminder/d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf/true");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response (GET https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/true):
+
+```json
+[
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "1 day before due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "fbb2633f-0bf4-412b-a51e-edad3fb4b058",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "5 days before due date",
+        "isActive": true,
+        "isCompleted": false,
+        "reminderDate": "2019-07-20T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "1 week before due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "10 days before due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "2 weeks before due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "1 day after due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "cf7f8d0a-7540-43de-b637-09f7dec0a273",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "5 days after due date",
+        "isActive": true,
+        "isCompleted": false,
+        "reminderDate": "2019-07-30T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "1 week after due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "10 days after due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "2 weeks after due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    }
+]
+```
+
+> Json Example Response (GET https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/false):
+
+```json
+[
+    {
+        "guid": "fbb2633f-0bf4-412b-a51e-edad3fb4b058",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "5 days before due date",
+        "isActive": true,
+        "isCompleted": false,
+        "reminderDate": "2019-07-20T00:00:00"
+    },
+    {
+        "guid": "cf7f8d0a-7540-43de-b637-09f7dec0a273",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "5 days after due date",
+        "isActive": true,
+        "isCompleted": false,
+        "reminderDate": "2019-07-30T00:00:00"
+    }
+]
+```
+
+This endpoint gets a invoice reminder.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/true`
+
+    or
+
+`GET https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/false`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Invoice’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+# Search
+
+## Search sales
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void SearchSales()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/Sales/false");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    merchantGuid = "19344275-985e-4dff-81ee-cb84b8ad356c",
+                    Status = "Transaction - Approved"
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "merchantGuid": "19344275-985e-4dff-81ee-cb84b8ad356c",
+    "Status": "Transaction - Approved"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "pageCurrent": 1,
+    "pageCurrentResults": 1,
+    "pageTotal": 1,
+    "pageSize": 10,
+    "totalResults": 1,
+    "cardSummary": null,
+    "searchResultDTO": [
+        {
+            "status": "Transaction - Approved",
+            "amount": 20.00,
+            "card": {
+                "cardHolderName": null,
+                "cardType": "Visa",
+                "card.first6": "123456",
+                "card.last4": "2910",
+                "cardToken": "xxxx-xxxx-xxxx-xxxx-2910"
+            },
+            "timeStamp": "2020-11-26T06:34:34.46-06:00",
+            "processorResponseMessage": "Success",
+            "effectiveAmount": 0.00,
+            "batchStatus": "Batch - Open",
+            "relatedVoid": {
+                "guid": "0f85c12d-9f51-49b8-8b8a-38238c89b9a6"
+            },
+            "guid": "372d66e5-1a5d-48ec-bebc-bb9347abe200",
+            "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+            "generatedByCapture": false,
+            "processorRefNumber": "24823396",
+            "type": "Credit",
+            "surchargeType": null,
+            "tipAmount": null,
+            "cardDataSource": "INTERNET",
+            "allowCardEmv": false,
+            "addressVerificationCode": "0",
+            "addressVerificationResult": "Full Match",
+            "cvvVerificationResult": " ",
+            "semiIntegrated": false,
+            "userName": "maxduplessy"
+        }
+    ]
+}
+```
+
+This endpoint search a sales.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/Sales/{exportable}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/Sales/{exportable}/{pageNumber}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/Sales/{exportable}/{pageNumber}/{pageSize}`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+Exportable | string | Mandatory | True or False. It means if you want results exportable to CSV.
+PageNumber | integer | Optional | Int. Number of page of the results. Default is 1 (Page size default is 500).
+PageSize | integer | Optional | Int. Size of each page of the results. Default is 500.
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant's Guid.
+AmountFrom | decimal | Optional | Amount of the transaction. Min. amt.: $0.50
+AmountTo | decimal | Optional | Amount of the transaction. Min. amt.: $0.50
+CardHolderName | string | Optional | Cardholder's name.
+Card.First6 | string | Optional | Card first six number.
+Card.Last4 | string | Optional | Card last four number.
+Card.Token | string | Optional | Card tokenized number value
+CardType | string | Optional | Card type.
+InvoiceNumber | string |  Optional | Sale's InvoiceNumber.
+OrderNumber | string |  Optional | Sale's order number. Length = 17.
+OrderDateFrom | date | Optional | Sale's order Date.
+OrderDateTo | date | Optional | Sale's order Date.
+TimeStampFrom | date | Optional | Sale's TimeStamp.
+TimeStampTo | date | Optional | Sale's TimeStamp.
+Status | string | Optional | Sale’s status.<br><br>Allowed values:<br><br>**1. Transaction - Approved**<br>**2. Transaction - Declined**<br>**3. Transaction - Created - Local**<br>**4. Transaction - Created - Error: Processor not reached**<br>**5. Transaction - Processor Error**<br>**6. Transaction - Approved - Warning**
+CustomerId | string | Optional | Customer Id.
+CustomData | string | Optional | Customer Data.
+GeneratedByCapture | boolean | Optional | Generated By Capture.<br><br>Allowed values:<br><br>**1. true**<br>**2. false**<br>
+ProcessorRefNumber | string | Optional | Processor Reference Number.
+UserName | string | Optional | UserName.
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+## Search voids
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void SearchVoids()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/Voids/false");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    merchantGuid = "19344275-985e-4dff-81ee-cb84b8ad356c",
+                    Status = "Transaction - Approved"
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "merchantGuid": "19344275-985e-4dff-81ee-cb84b8ad356c",
+    "Status": "Transaction - Approved"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "pageCurrent": 1,
+    "pageCurrentResults": 1,
+    "pageTotal": 1,
+    "pageSize": 500,
+    "totalResults": 1,
+    "cardSummary": null,
+    "searchResultDTO": [
+        {
+            "status": "Transaction - Approved",
+            "sale": {
+                "amount": 10.00,
+                "card": {
+                    "cardHolderName": null,
+                    "cardType": "Visa",
+                    "card.last4": "6734"
+                }
+            },
+            "voidReason": "POST_AUTH_USER_DECLINE",
+            "timeStamp": "2020-11-26T06:40:25.7-06:00",
+            "processorStatusCode": "A0000",
+            "batchStatus": "Batch - Open",
+            "guid": "4130888a-cb0a-41a9-9d06-d90e10535b2a",
+            "allowCardEmv": false,
+            "userName": "maxduplessy"
+        }
+    ]
+}
+```
+
+This endpoint search a voids.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/Voids/{exportable}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/Voids/{exportable}/{pageNumber}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/Voids/{exportable}/{pageNumber}/{pageSize}`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+Exportable | string | Mandatory | True or False. It means if you want results exportable to CSV.
+PageNumber | integer | Optional | Int. Number of page of the results. Default is 1 (Page size default is 500).
+PageSize | integer | Optional | Int. Size of each page of the results. Default is 500.
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant's Guid.
+VoidReason | string | Optional | Indicates the reason the transaction was voided.<br><br>Allowed values:<br><br>**1. POST_AUTH_USER_DECLINE**<br>**2. DEVICE_TIMEOUT**<br>**3. DEVICE_UNAVAILABLE**<br>**4. PARTIAL_REVERSAL**<br>**5. TORN_TRANSACTION**<br>**6. POST_AUTH_CHIP_DECLINE**
+Status | string | Optional | Void’s status.<br><br>Allowed values:<br><br>**1. Transaction - Approved**<br>**2. Transaction - Declined**<br>**3. Transaction - Created - Local**<br>**4. Transaction - Created - Error: Processor not reached**<br>**5. Transaction - Processor Error**<br>**6. Transaction - Approved - Warning**
+TimeStampFrom | date | Optional | Void's TimeStamp.
+TimeStampTo | date | Optional | Void's TimeStamp.
+UserName | string | Optional | UserName.
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+## Search returns
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void SearchReturns()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/Returns/false");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    merchantGuid = "19344275-985e-4dff-81ee-cb84b8ad356c",
+                    Status = "Transaction - Approved"                
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "merchantGuid": "19344275-985e-4dff-81ee-cb84b8ad356c",
+    "Status": "Transaction - Approved"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "pageCurrent": 1,
+    "pageCurrentResults": 1,
+    "pageTotal": 1,
+    "pageSize": 500,
+    "totalResults": 1,
+    "cardSummary": null,
+    "searchResultDTO": [
+        {
+            "status": "Transaction - Approved",
+            "amount": 19.74,
+            "card": {
+                "cardHolderName": "John Doe",
+                "cardType": "Mastercard",
+                "card.last4": "0213"
+            },
+            "timeStamp": "2020-11-25T07:17:24.15-06:00",
+            "processorStatusCode": "A0014",
+            "batchStatus": "Batch - Closed",
+            "userName": "maxduplessy",
+            "guid": "9fb17f4e-b508-48d3-bd77-bb6813b42620",
+            "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+            "saleGuid": "b4084e11-884d-468c-84d9-614c5b986fde",
+            "type": "CreditReturn",
+            "cardDataSource": "",
+            "allowCardEmv": false
+        }
+    ]
+}
+```
+
+This endpoint search a returns.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/Returns/{exportable}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/Returns/{exportable}/{pageNumber}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/Returns/{exportable}/{pageNumber}/{pageSize}`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+
+### URL Parameters:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+Exportable | string | Mandatory | True or False. It means if you want results exportable to CSV.
+PageNumber | integer | Optional | Int. Number of page of the results. Default is 1 (Page size default is 500).
+PageSize | integer | Optional | Int. Size of each page of the results. Default is 500.
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant's Guid.
+AmountFrom | decimal | Optional | Amount of the transaction. Min. amt.: $0.50
+AmountTo | decimal | Optional | Amount of the transaction. Min. amt.: $0.50
+Status | string | Optional | Return’s status.<br><br>Allowed values:<br><br>**1. Transaction - Approved**<br>**2. Transaction - Declined**<br>**3. Transaction - Created - Local**<br>**4. Transaction - Created - Error: Processor not reached**<br>**5. Transaction - Processor Error**<br>**6. Transaction - Approved - Warning**
+Card.Last4 | string | Optional | Card last four number.
+TimeStampFrom | date | Optional | Return's TimeStamp.
+TimeStampTo | date | Optional | Return's TimeStamp.
+UserName | string | Optional | UserName.
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+## Search authOnlys
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void SearchAuthOnlys()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/AuthOnlys/false");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    merchantGuid = "19344275-985e-4dff-81ee-cb84b8ad356c",
+                    Status = "Transaction - Approved"
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "merchantGuid": "19344275-985e-4dff-81ee-cb84b8ad356c",
+    "Status": "Transaction - Approved"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "pageCurrent": 1,
+    "pageCurrentResults": 1,
+    "pageTotal": 1,
+    "pageSize": 10,
+    "totalResults": 1,
+    "cardSummary": null,
+    "searchResultDTO": [
+        {
+            "status": "Transaction - Approved",
+            "amount": 10.00,
+            "effectiveAmount": 10.00,
+            "card": {
+                "cardHolderName": "John Doe",
+                "cardType": "Mastercard",
+                "card.first6": "123456",
+                "card.last4": "9426",
+                "cardToken": "xxxx-xxxx-xxxx-xxxx-9426"
+            },
+            "orderNumber": "11518",
+            "orderDate": "2020-11-24T00:00:00",
+            "timeStamp": "2020-11-24T14:18:54.16-06:00",
+            "customerId": "xt147",
+            "processorResponseMessage": "Success",
+            "batchStatus": "Batch - Closed",
+            "relatedCapture": {
+                "guid": "284dd923-a266-4d0f-80bd-e8441154c742",
+                "newAmount": 10.00
+            },
+            "relatedVoid": null,
+            "guid": "493cffed-232a-4896-b9ca-36b543d7da13",
+            "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+            "partiallyApprovedAmount": null,
+            "cardDataSource": "INTERNET",
+            "allowCardEmv": false,
+            "addressVerificationCode": "N",
+            "addressVerificationResult": "No Match",
+            "cvvVerificationCode": "M",
+            "cvvVerificationResult": "Passed",
+            "semiIntegrated": null,
+            "userName": "maxduplessy"
+        }
+    ]
+}
+```
+
+This endpoint search an authOnlys.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/AuthOnlys/{exportable}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/AuthOnlys/{exportable}/{pageNumber}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/AuthOnlys/{exportable}/{pageNumber}/{pageSize}`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+Exportable | string | Mandatory | True or False. It means if you want results exportable to CSV.
+PageNumber | integer | Optional | Int. Number of page of the results. Default is 1 (Page size default is 500).
+PageSize | integer | Optional | Int. Size of each page of the results. Default is 500.
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant's Guid.
+AmountFrom | decimal | Optional | Amount of the transaction. Min. amt.: $0.50
+AmountTo | decimal | Optional | Amount of the transaction. Min. amt.: $0.50
+Card.First6 | string | Optional | Card first six number.
+Card.Last4 | string | Optional | Card last four number.
+CardToken | string | Optional | Card tokenized number value.
+CardHolderName | string | Optional | Cardholder's name.
+CardType | string | Optional | Card Type.
+InvoiceNumber | string |  Optional | AuthOnly's InvoiceNumber.
+OrderNumber | string |  Optional | AuthOnly's order number. Length = 17.
+OrderDateFrom | date | Optional | AuthOnly's order Date.
+OrderDateTo | date | Optional | AuthOnly's order Date.
+TimeStampFrom | date | Optional | AuthOnly's TimeStamp.
+TimeStampTo | date | Optional | AuthOnly's TimeStamp.
+Status | string | Optional | AuthOnly’s status.<br><br>Allowed values:<br><br>**1. Transaction - Approved**<br>**2. Transaction - Declined**<br>**3. Transaction - Created - Local**<br>**4. Transaction - Created - Error: Processor not reached**<br>**5. Transaction - Processor Error**<br>**6. Transaction - Approved - Warning**
+MerchantCustomerId | string | Optional | Merchant Customer Id.
+UserName | string | Optional | UserName.
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Search captures
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void SearchCaptures()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/Captures/false");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    merchantGuid = "19344275-985e-4dff-81ee-cb84b8ad356c",
+                    Status = "Transaction - Approved"
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "merchantGuid": "19344275-985e-4dff-81ee-cb84b8ad356c",
+    "Status": "Transaction - Approved"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "pageCurrent": 1,
+    "pageCurrentResults": 1,
+    "pageTotal": 1,
+    "pageSize": 500,
+    "totalResults": 1,
+    "cardSummary": null,
+    "searchResultDTO": [
+        {
+            "status": "Transaction - Approved",
+            "authOnly": {
+                "status": null,
+                "amount": 10.00,
+                "effectiveAmount": null,
+                "card": {
+                    "cardHolderName": "John Doe",
+                    "cardType": "Mastercard",
+                    "card.last4": "9426"
+                },
+                "orderNumber": "11518",
+                "orderDate": "2020-11-24T00:00:00",
+                "timeStamp": "0001-01-01T00:00:00",
+                "customerId": null,
+                "processorResponseMessage": null,
+                "batchStatus": null,
+                "relatedCapture": null,
+                "relatedVoid": null,
+                "guid": "493cffed-232a-4896-b9ca-36b543d7da13",
+                "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+                "partiallyApprovedAmount": null,
+                "cardDataSource": null,
+                "allowCardEmv": false,
+                "addressVerificationCode": null,
+                "addressVerificationResult": null,
+                "cvvVerificationCode": null,
+                "cvvVerificationResult": null,
+                "semiIntegrated": null,
+                "userName": null
+            },
+            "newAmount": 10.00,
+            "timeStamp": "2020-11-24T14:21:25.59-06:00",
+            "processorResponseMessage": "Success",
+            "batchStatus": "Batch - Closed",
+            "guid": "284dd923-a266-4d0f-80bd-e8441154c742",
+            "allowCardEmv": false,
+            "userName": "maxduplessy"
+        }
+    ]
+}
+```
+
+This endpoint search a captures.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/Captures/{exportable}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/Captures/{exportable}/{pageNumber}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/Captures/{exportable}/{pageNumber}/{pageSize}`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+Exportable | string | Mandatory | True or False. It means if you want results exportable to CSV.
+PageNumber | integer | Optional | Int. Number of page of the results. Default is 1 (Page size default is 500).
+PageSize | integer | Optional | Int. Size of each page of the results. Default is 500.
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant's Guid.
+NewAmountFrom | decimal | Optional | NewAmount From of the transaction. Min. amt.: $0.50
+NewAmountTo | decimal | Optional | NewAmount To of the transaction. Min. amt.: $0.50
+TimeStampFrom | date | Optional | Capture's TimeStamp From.
+TimeStampTo | date | Optional | Capture's TimeStamp To.
+Status | string | Optional | Capture’s status.<br><br>Allowed values:<br><br>**1. Transaction - Approved**<br>**2. Transaction - Declined**<br>**3. Transaction - Created - Local**<br>**4. Transaction - Created - Error: Processor not reached**<br>**5. Transaction - Processor Error**<br>**6. Transaction - Approved - Warning**
+UserName | string | Optional | UserName.
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+## Search verify
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void SearchVerify()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/Verify/false");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    merchantGuid = "19344275-985e-4dff-81ee-cb84b8ad356c",
+                    Status = "Transaction - Approved"
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "merchantGuid": "19344275-985e-4dff-81ee-cb84b8ad356c",
+    "Status": "Transaction - Approved"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "pageCurrent": 1,
+    "pageCurrentResults": 1,
+    "pageTotal": 1,
+    "pageSize": 500,
+    "totalResults": 1,
+    "cardSummary": null,
+    "searchResultDTO": [
+        {
+            "status": "Transaction - Approved",
+            "card": {
+                "cardHolderName": "Justin Troudeau",
+                "cardType": "Visa",
+                "card.first6": "123456",
+                "card.last4": "7402",
+                "cardToken": "xxxx-xxxx-xxxx-xxxx-7402"
+            },
+            "timeStamp": "2020-11-25T07:24:25.29-06:00",
+            "processorStatusCode": "A0000",
+            "userName": "maxduplessy"
+        }
+    ]
+}
+```
+
+This endpoint search a verify.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/Verify/{exportable}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/Verify/{exportable}/{pageNumber}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/Verify/{exportable}/{pageNumber}/{pageSize}`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+Exportable | string | Mandatory | True or False. It means if you want results exportable to CSV.
+PageNumber | integer | Optional | Int. Number of page of the results. Default is 1 (Page size default is 500).
+PageSize | integer | Optional | Int. Size of each page of the results. Default is 500.
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant's Guid.
+Card.First6 | string | Optional | Card first six number.
+Card.Last4 | string | Optional | Card last four number.
+Card.Token | string | Optional | Card tokenized number value
+CardHolderName | string | Optional | Cardholder's name.
+CardType | string | Optional | Card Type.
+TimeStampFrom | date | Optional | Verify's TimeStamp From.
+TimeStampTo | date | Optional | Verify's TimeStamp To.
+Status | string | Optional | Verify’s status.<br><br>Allowed values:<br><br>**1. Transaction - Approved**<br>**2. Transaction - Declined**<br>**3. Transaction - Created - Local**<br>**4. Transaction - Created - Error: Processor not reached**<br>**5. Transaction - Processor Error**<br>**6. Transaction - Approved - Warning**
+UserName | string | Optional | UserName.
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+## Search Recurring Billings
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void SearchRecurringBillings()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/RecurringBillings/false");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    merchantGuid = "19344275-985e-4dff-81ee-cb84b8ad356c",
+                    Status = "Transaction - Approved"
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "merchantGuid": "19344275-985e-4dff-81ee-cb84b8ad356c",
+    "Status": "Transaction - Approved"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "pageCurrent": 1,
+    "pageCurrentResults": 1,
+    "pageTotal": 1,
+    "pageSize": 10,
+    "totalResults": 1,
+    "cardSummary": null,
+    "searchResultDTO": [
+        {
+            "status": "RecurringBilling - Active",
+            "interval": "monthly",
+            "intervalValue": "april, may, june",
+            "amount": 10.50,
+            "name": "John Doe",
+            "recurringBillingNumber": "64942678",
+            "startDate": "2021-05-13T00:00:00",
+            "endDate": "2023-04-01T00:00:00",
+            "paymentCount": null,
+            "processorResponseMessage": null,
+            "card.first6": "123456",
+            "card.last4": "6019",
+            "accountNumberLastFour": null,
+            "timeStamp": "2020-11-25T14:31:38.6",
+            "invoiceGuid": "00000000-0000-0000-0000-000000000000",
+            "invoiceNumber": null,
+            "guid": "11fd2d0a-298f-4387-81ed-ffd6780f7a21",
+            "scheduleNotes": "Cable",
+            "pause": null,
+            "accountNumber": "",
+            "pauseStartDate": null,
+            "pauseEndDate": null,
+            "userName": "maxduplessy"
+        }
+    ]
+}
+```
+
+This endpoint search a recurring billings.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/RecurringBillings/{exportable}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/RecurringBillings/{exportable}/{pageNumber}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/RecurringBillings/{exportable}/{pageNumber}/{pageSize}`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+Exportable | string | Mandatory | True or False. It means if you want results exportable to CSV.
+PageNumber | integer | Optional | Int. Number of page of the results. Default is 1 (Page size default is 500).
+PageSize | integer | Optional | Int. Size of each page of the results. Default is 500.
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant's Guid.
+CardOnly | string | Optional | Card Only.
+BankAccountOnly | string | Optional | Bank Account Only.
+Status | string | Optional | Recurring billing status.<br><br>Allowed values:<br><br>**1. RecurringBilling -  Active**<br>**2. RecurringBilling - Created - Local** <br>**3. RecurringBilling - Created - Error: Processor not reached** <br>**4. RecurringBilling - Created - Processor Fail** <br>**5. RecurringBilling -  Deactivated** <br>**6. RecurringBilling -  Paused** <br>**7. RecurringBilling - Finished** <br>**8. RecurringBilling - Deleted** <br>**9. RecurringBilling - Active Started**
+Name | string | Optional | Name.
+AmountFrom | decimal | Optional |  amount from of the transaction. Min. amt.: $0.50
+AmountTo | decimal | Optional |  amount to of the transaction. Min. amt.: $0.50
+CreatedDateFrom | date | Optional | Created Date From RecurringBillings.
+CreatedDateTo | date | Optional | Created Date To RecurringBillings.
+BillingDateFrom | date | Optional | Created Billing Date From RecurringBillings.
+BillingDateTo | date | Optional | Created Billing Date To RecurringBillings.
+LastFour | string | Optional | LastFour.
+RecurringBillingNumber | string | Optional | RecurringBillingNumber.
+ScheduleNotes | string | Optional | ScheduleNotes.
+ScheduleExceptions | string | Optional | ScheduleExceptions.
+UserName | string | Optional | UserName.
+AccountNumber | string | Optional | AccountNumber.
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Search bank clearing
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void SearchBankClearing()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/BankClearings/false");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    merchantGuid = "19344275-985e-4dff-81ee-cb84b8ad356c",
+                    Status = "Transaction - Approved"
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "merchantGuid": "19344275-985e-4dff-81ee-cb84b8ad356c",
+    "Status": "Transaction - Approved"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "pageCurrent": 1,
+    "pageCurrentResults": 1,
+    "pageTotal": 1,
+    "pageSize": 500,
+    "totalResults": 1,
+    "cardSummary": null,
+    "searchResultDTO": [
+        {
+            "status": "Transaction - Approved - Warning",
+            "amount": 3.50,
+            "effectiveAmount": 0.00,
+            "bankAccount": {
+                "nameOnAccount": "Joe Black",
+                "routingNumber": "211274450",
+                "lastFour": "2020"
+            },
+            "orderNumber": "11518",
+            "timeStamp": "2020-11-24T08:53:17.61-06:00",
+            "updateTimeStamp": null,
+            "fromRecurringBilling": false,
+            "customerId": "xt147",
+            "processorResponseMessage": "HELD",
+            "relatedVoid": null,
+            "relatedReturn": "f76fda9b-3632-441b-aa8c-f98ff4389ade",
+            "guid": "8c7d4ce1-1cd2-4c92-ac24-86bf7ae1c0ed",
+            "deviceGuid": "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+            "responseTransactionStatus": "Debit Sent",
+            "responseSettlementStatus": "Credit Sent",
+            "responseCode": "HELD",
+            "userName": "maxduplessy"
+        }
+    ]
+}
+```
+
+This endpoint search a bank clearings.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearings/{exportable}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearings/{exportable}/{pageNumber}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearings/{exportable}/{pageNumber}/{pageSize}`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+Exportable | string | Mandatory | True or False. It means if you want results exportable to CSV.
+PageNumber | integer | Optional | Int. Number of page of the results. Default is 1 (Page size default is 500).
+PageSize | integer | Optional | Int. Size of each page of the results. Default is 500.
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant's Guid.
+Status | string | Optional | Bank clearing’s status.<br><br>Allowed values:<br><br>**1. Transaction - Approved**<br>**2. Transaction - Declined**<br>**3. Transaction - Created - Local**<br>**4. Transaction - Created - Error: Processor not reached**<br>**5. Transaction - Processor Error**<br>**6. Transaction - Approved - Warning**
+TotalAmountFrom | decimal | Optional | Total amount from of the transaction. Min. amt.: $0.50
+TotalAmountTo | decimal | Optional | Total amount to of the transaction. Min. amt.: $0.50
+NameOnAccount | string | Optional | Account's name.
+RoutingNumber | string | Optional | Routing's number. Must be 9 characters (example: 490000018).
+AccountNumberLastFour | string | Optional | Account's number last four.
+FromRecurringBilling | boolean | Optional | From RecurringBilling.
+OrderNumber | string |  Optional | Merchant's order number. The value sent on this element will be returned as InvoiceNumber. Length = 17.
+TimeStampFrom | date | Optional | Bank clearing's TimeStamp.
+TimeStampTo | date | Optional | Bank clearing's TimeStamp.
+MerchantCustomerId | string | Optional | Merchant Customer Id.
+UserName | string | Optional | UserName.
+SettlementStatus | string | Optional | Settlement’s status.<br><br>Allowed values:<br><br>**1.Pending**<br>**2. Debit Sent**<br>**3. Credit Sent**<br>**4. Chargeback**<br>**5. Not Available**<br>**6. No Credit**<br>**7. Voided**<br>**8. Returned**<br>**9. Cancelled**
+
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+## Search bank clearing voids
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void SearchBankClearingVoids()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/BankClearingVoids/false");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    merchantGuid = "19344275-985e-4dff-81ee-cb84b8ad356c",
+                    Status = "Transaction - Approved"
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "merchantGuid": "19344275-985e-4dff-81ee-cb84b8ad356c",
+    "UserName": "maxduplessy"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "pageCurrent": 1,
+    "pageCurrentResults": 1,
+    "pageTotal": 1,
+    "pageSize": 500,
+    "totalResults": 1,
+    "cardSummary": null,
+    "searchResultDTO": [
+        {
+            "status": "Transaction - Approved",
+            "relatedClearing": {
+                "status": null,
+                "amount": 3.50,
+                "effectiveAmount": 0.0,
+                "bankAccount": {
+                    "nameOnAccount": "max tomassi",
+                    "routingNumber": "211274450",
+                    "lastFour": "5678"
+                },
+                "orderNumber": "11518",
+                "timeStamp": "0001-01-01T00:00:00",
+                "updateTimeStamp": null,
+                "fromRecurringBilling": null,
+                "customerId": null,
+                "processorResponseMessage": null,
+                "relatedVoid": null,
+                "relatedReturn": null,
+                "guid": "00000000-0000-0000-0000-000000000000",
+                "deviceGuid": "00000000-0000-0000-0000-000000000000",
+                "responseTransactionStatus": null,
+                "responseSettlementStatus": null,
+                "responseCode": null,
+                "userName": null
+            },
+            "timeStamp": "2020-11-26T08:20:33.7-06:00",
+            "processorResponseMessage": "VOIDED",
+            "guid": "8fc24460-718f-4db2-a5cb-31ce722cec3a",
+            "userName": "maxduplessy"
+        }
+    ]
+}
+```
+
+This endpoint search a bank clearing voids.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearingVoids/{exportable}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearingVoids/{exportable}/{pageNumber}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearingVoids/{exportable}/{pageNumber}/{pageSize}`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+Exportable | string | Mandatory | True or False. It means if you want results exportable to CSV.
+PageNumber | integer | Optional | Int. Number of page of the results. Default is 1 (Page size default is 500).
+PageSize | integer | Optional | Int. Size of each page of the results. Default is 500.
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant's Guid.
+OrderNumber | string |  Optional | Merchant's order number. The value sent on this element will be returned as InvoiceNumber. Length = 17.
+TimeStampFrom | date | Optional | Bank clearing void's TimeStamp.
+TimeStampTo | date | Optional | Bank clearing void's TimeStamp.
+Status | string | Optional | Bank clearing void’s status.<br><br>Allowed values:<br><br>**1. Transaction - Approved**<br>**2. Transaction - Declined**<br>**3. Transaction - Created - Local**<br>**4. Transaction - Created - Error: Processor not reached**<br>**5. Transaction - Processor Error**<br>**6. Transaction - Approved - Warning**
+UserName | string | Optional | UserName.
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Search bank clearing returns
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void SearchBankClearingReturns()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/BankClearingReturns/false");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    merchantGuid = "19344275-985e-4dff-81ee-cb84b8ad356c",
+                    Status = "Transaction - Approved"
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "merchantGuid": "19344275-985e-4dff-81ee-cb84b8ad356c",
+    "Status": "Transaction - Approved"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "pageCurrent": 1,
+    "pageCurrentResults": 1,
+    "pageTotal": 1,
+    "pageSize": 500,
+    "totalResults": 1,
+    "cardSummary": null,
+    "searchResultDTO": [
+        {
+            "status": "Transaction - Approved - Warning",
+            "relatedClearing": {
+                "status": null,
+                "amount": 3.50,
+                "effectiveAmount": 0.0,
+                "bankAccount": {
+                    "nameOnAccount": "Joe Black",
+                    "routingNumber": "211274450",
+                    "lastFour": "2020"
+                },
+                "orderNumber": "11518",
+                "timeStamp": "0001-01-01T00:00:00",
+                "updateTimeStamp": null,
+                "fromRecurringBilling": null,
+                "customerId": null,
+                "processorResponseMessage": null,
+                "relatedVoid": null,
+                "relatedReturn": null,
+                "guid": "00000000-0000-0000-0000-000000000000",
+                "deviceGuid": "00000000-0000-0000-0000-000000000000",
+                "responseTransactionStatus": null,
+                "responseSettlementStatus": null,
+                "responseCode": null,
+                "userName": null
+            },
+            "timeStamp": "2020-11-24T09:05:12.05-06:00",
+            "processorResponseMessage": "HELD",
+            "guid": "f76fda9b-3632-441b-aa8c-f98ff4389ade",
+            "userName": null
+        }
+    ]
+}
+```
+
+This endpoint search a bank clearing returns.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearingReturns/{exportable}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearingReturns/{exportable}/{pageNumber}`
+<br>
+<br>
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearingReturns/{exportable}/{pageNumber}/{pageSize}`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+Exportable | string | Mandatory | True or False. It means if you want results exportable to CSV.
+PageNumber | integer | Optional | Int. Number of page of the results. Default is 1 (Page size default is 500).
+PageSize | integer | Optional | Int. Size of each page of the results. Default is 500.
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant's Guid.
+OrderNumber | string |  Optional | Merchant's order number. The value sent on this element will be returned as InvoiceNumber. Length = 17.
+TimeStampFrom | date | Optional | Bank clearing void's TimeStamp.
+TimeStampTo | date | Optional | Bank clearing void's TimeStamp.
+Status | string | Optional | Bank clearing void’s status.<br><br>Allowed values:<br><br>**1. Transaction - Approved**<br>**2. Transaction - Declined**<br>**3. Transaction - Created - Local**<br>**4. Transaction - Created - Error: Processor not reached**<br>**5. Transaction - Processor Error**<br>**6. Transaction - Approved - Warning**
+UserName | string | Optional | UserName.
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+## Search bank Clearing Settlement
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void ShowSettlements()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/BankClearings/ShowSettlements");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    DeviceGuid = "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+                    SettleDateBegin = "01/01/2010",
+                    SettleDateEnd = "12/01/2020"
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "DeviceGuid" : "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+    "SettleDateBegin": "01/01/2010",
+    "SettleDateEnd": "12/01/2020"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "summary": {
+        "error": "",
+        "message": "",
+        "requestCount": 1,
+        "successCount": 1,
+        "failCount": 0,
+        "timeStamp": "11/27/2020 8:58:20 AM",
+        "executeTime": 0.0
+    },
+    "items": [
+        {
+            "settlementId": "1931",
+            "settlementDate": "2020-11-17T08:22:00",
+            "fileId": "1162",
+            "subMerchantNum": "",
+            "settlementAmount": 398.0000,
+            "settlementType": "Origination File Settlement",
+            "approvedDebits": 398.0000,
+            "approvedCredits": 0.0,
+            "debitCreditFees": 0.0,
+            "nocFees": 0.0,
+            "returnFees": 0.0,
+            "reserve": 0.0,
+            "discount": 0.0,
+            "chargebacks": 0.0,
+            "chargebackFees": 0.0,
+            "extendedHoursFees": 0.0,
+            "adminFees": 0.0,
+            "deliveryMethod": 0.0,
+            "offset": 0.0
+        }
+    ],
+    "messageXml": "<?xml version='1.0'?>\n<BOPRequest>\n<ResponseSummary>\n<Error></Error>\n<Message></Message>\n<RequestCount>1</RequestCount>\n<SuccessCount>1</SuccessCount>\n<FailCount>0</FailCount>\n<TimeStamp>11/27/2020 8:58:20 AM</TimeStamp>\n<ExecuteTime>0</ExecuteTime>\n</ResponseSummary>\n<Request ID=\"1\">\n<RequestType>ShowSettlements</RequestType>\n<Status>Success</Status>\n<StatusMessage/>\n<TimeStamp>11/27/2020 8:58:20 AM</TimeStamp>\n<Results Count=\"1\">\n<Result ID=\"1\">\n<SettlementID>1931</SettlementID>\n<SettlementDate>11/17/2020 8:22:00 AM</SettlementDate>\n<FileID>1162</FileID>\n<SubMerchantNum></SubMerchantNum>\n<SettlementAmount>398.0000</SettlementAmount>\n<SettlementType>1</SettlementType>\n<ApprovedDebits>398.0000</ApprovedDebits>\n<ApprovedCredits>0</ApprovedCredits>\n<DebitCreditFees>0</DebitCreditFees>\n<NOCFees>0</NOCFees>\n<ReturnFees>0</ReturnFees>\n<Reserve>0</Reserve>\n<Discount>0</Discount>\n<Chargebacks>0</Chargebacks>\n<ChargebackFees>0</ChargebackFees>\n<ExtendedHoursFees>0</ExtendedHoursFees>\n<AdminFees>0</AdminFees>\n<DeliveryMethod>ACH</DeliveryMethod>\n<Offset>0</Offset>\n</Result>\n</Results>\n</Request>\n</BOPRequest>\n"
+}
+```
+
+This endpoint searchs Bank Clearing Settlement.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearings/ShowSettlements`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device's Guid.
+SettleDateBegin | string | Mandatory | Settle Date Begin.
+SettleDateEnd | string | Mandatory | Settle Date End.
+
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+## Search bank Clearing Settlement Details
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void ShowSettlementDetails()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/BankClearings/ShowSettlementDetails");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    DeviceGuid = "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+                    SettlementId = "1931"
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "DeviceGuid" : "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+    "SettlementId" : 1931
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "summary": {
+        "error": "",
+        "message": "",
+        "requestCount": 1,
+        "successCount": 1,
+        "failCount": 0,
+        "timeStamp": "11/27/2020 9:00:23 AM",
+        "executeTime": 0.0
+    },
+    "item": {
+        "status": "Success",
+        "statusMessage": "",
+        "transactionId": "22275",
+        "transactionType": "CREDIT",
+        "fileId": "1162",
+        "subMerchantNum": "",
+        "amount": 299.0000,
+        "customerId": "543f9dd4-1234-4e69-a5e9-212b9486020e",
+        "accountName": "Irish City"
+    },
+    "messageXml": "<?xml version='1.0'?>\n<BOPRequest>\n<ResponseSummary>\n<Error></Error>\n<Message></Message>\n<RequestCount>1</RequestCount>\n<SuccessCount>1</SuccessCount>\n<FailCount>0</FailCount>\n<TimeStamp>11/27/2020 9:00:23 AM</TimeStamp>\n<ExecuteTime>0</ExecuteTime>\n</ResponseSummary>\n<Request ID=\"1\">\n<RequestType>ShowSettlementDetails</RequestType>\n<Status>Success</Status>\n<StatusMessage/>\n<TimeStamp>11/27/2020 9:00:23 AM</TimeStamp>\n<Results Count=\"2\">\n<Result ID=\"1\">\n<TransactionID>22274</TransactionID>\n<TransactionType>CREDIT</TransactionType>\n<FileID>1162</FileID>\n<SubMerchantNum></SubMerchantNum>\n<Amount>99.0000</Amount>\n<CustomerID>8337ea32-1234-4ddb-9b80-6f67c7d7048a</CustomerID>\n<AccountName>Galaxy Fun Park</AccountName>\n</Result>\n<Result ID=\"2\">\n<TransactionID>22275</TransactionID>\n<TransactionType>CREDIT</TransactionType>\n<FileID>1162</FileID>\n<SubMerchantNum></SubMerchantNum>\n<Amount>299.0000</Amount>\n<CustomerID>543f9dd4-1234-4e69-a5e9-212b9486020e</CustomerID>\n<AccountName>Irish City</AccountName>\n</Result>\n</Results>\n</Request>\n</BOPRequest>\n"
+}
+```
+
+This endpoint Searchs bank Clearing Settlement Details.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearings/ShowSettlementDetails`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device's Guid.
+SettlementId | string | Mandatory | Settlement Id.
+
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+## Search bank Clearing Notifications
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void ShowReturnNotificationList()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/BankClearings/ShowReturnNotificationList");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    DeviceGuid = "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+                    NotificationDateBegin = "2020-11-11",
+                    NotificationDateEnd = "2021-11-11"
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "DeviceGuid": "0e51ea3e-56ff-49e6-9d72-39f2058774a1",
+    "NotificationDateBegin": "2020-11-11",
+    "NotificationDateEnd": "2021-11-11"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "summary": {
+        "error": "",
+        "message": "",
+        "requestCount": 1,
+        "successCount": 1,
+        "failCount": 0,
+        "timeStamp": "11/16/2021 4:44:55 PM",
+        "executeTime": 0.0
+    },
+    "items": [
+        {
+            "messageXml": "<Result ID=\"1\"><NotificationID>66</NotificationID><NotificationTime>11/23/2020 5:06:39 PM</NotificationTime><Announced>True</Announced><Retrieved>False</Retrieved><Description>RETURN NOTIFICATION FOR RETURN FILE ID: 9999</Description></Result>",
+            "messageJson": "{\"Result\":{\"@ID\":\"1\",\"NotificationID\":\"66\",\"NotificationTime\":\"11/23/2020 5:06:39 PM\",\"Announced\":\"True\",\"Retrieved\":\"False\",\"Description\":\"RETURN NOTIFICATION FOR RETURN FILE ID: 9999\"}}",
+            "notificationId": "66",
+            "notificationTime": "2020-11-23T17:06:39",
+            "announced": true,
+            "retrieved": false,
+            "description": "RETURN NOTIFICATION FOR RETURN FILE ID: 9999"
+        },
+        {
+            "messageXml": "<Result ID=\"2\"><NotificationID>67</NotificationID><NotificationTime>11/23/2020 5:08:08 PM</NotificationTime><Announced>True</Announced><Retrieved>False</Retrieved><Description>RETURN NOTIFICATION FOR RETURN FILE ID: 9999</Description></Result>",
+            "messageJson": "{\"Result\":{\"@ID\":\"2\",\"NotificationID\":\"67\",\"NotificationTime\":\"11/23/2020 5:08:08 PM\",\"Announced\":\"True\",\"Retrieved\":\"False\",\"Description\":\"RETURN NOTIFICATION FOR RETURN FILE ID: 9999\"}}",
+            "notificationId": "67",
+            "notificationTime": "2020-11-23T17:08:08",
+            "announced": true,
+            "retrieved": false,
+            "description": "RETURN NOTIFICATION FOR RETURN FILE ID: 9999"
+        },
+        {
+            "messageXml": "<Result ID=\"3\"><NotificationID>71</NotificationID><NotificationTime>12/2/2020 2:12:02 PM</NotificationTime><Announced>True</Announced><Retrieved>False</Retrieved><Description>RETURN NOTIFICATION FOR RETURN FILE ID: 9999</Description></Result>",
+            "messageJson": "{\"Result\":{\"@ID\":\"3\",\"NotificationID\":\"71\",\"NotificationTime\":\"12/2/2020 2:12:02 PM\",\"Announced\":\"True\",\"Retrieved\":\"False\",\"Description\":\"RETURN NOTIFICATION FOR RETURN FILE ID: 9999\"}}",
+            "notificationId": "71",
+            "notificationTime": "2020-12-02T14:12:02",
+            "announced": true,
+            "retrieved": false,
+            "description": "RETURN NOTIFICATION FOR RETURN FILE ID: 9999"
+        }
+    ],
+    "messageXml": "<?xml version='1.0'?>\n<BOPRequest>\n<ResponseSummary>\n<Error></Error>\n<Message></Message>\n<RequestCount>1</RequestCount>\n<SuccessCount>1</SuccessCount>\n<FailCount>0</FailCount>\n<TimeStamp>11/16/2021 4:44:55 PM</TimeStamp>\n<ExecuteTime>0</ExecuteTime>\n</ResponseSummary>\n<Request ID=\"1\">\n<RequestType>ShowReturnNotificationList</RequestType>\n<Status>Success</Status>\n<StatusMessage/>\n<TimeStamp>11/16/2021 4:44:55 PM</TimeStamp>\n<Results Count=\"3\">\n<Result ID=\"1\">\n<NotificationID>66</NotificationID>\n<NotificationTime>11/23/2020 5:06:39 PM</NotificationTime>\n<Announced>True</Announced>\n<Retrieved>False</Retrieved>\n<Description>RETURN NOTIFICATION FOR RETURN FILE ID: 9999</Description>\n</Result>\n<Result ID=\"2\">\n<NotificationID>67</NotificationID>\n<NotificationTime>11/23/2020 5:08:08 PM</NotificationTime>\n<Announced>True</Announced>\n<Retrieved>False</Retrieved>\n<Description>RETURN NOTIFICATION FOR RETURN FILE ID: 9999</Description>\n</Result>\n<Result ID=\"3\">\n<NotificationID>71</NotificationID>\n<NotificationTime>12/2/2020 2:12:02 PM</NotificationTime>\n<Announced>True</Announced>\n<Retrieved>False</Retrieved>\n<Description>RETURN NOTIFICATION FOR RETURN FILE ID: 9999</Description>\n</Result>\n</Results>\n</Request>\n</BOPRequest>\n",
+    "messageJson": "{\"BOPRequest\":{\"ResponseSummary\":{\"Error\":\"\",\"Message\":\"\",\"RequestCount\":\"1\",\"SuccessCount\":\"1\",\"FailCount\":\"0\",\"TimeStamp\":\"11/16/2021 4:44:55 PM\",\"ExecuteTime\":\"0\"},\"Request\":{\"@ID\":\"1\",\"RequestType\":\"ShowReturnNotificationList\",\"Status\":\"Success\",\"StatusMessage\":null,\"TimeStamp\":\"11/16/2021 4:44:55 PM\",\"Results\":{\"@Count\":\"3\",\"Result\":[{\"@ID\":\"1\",\"NotificationID\":\"66\",\"NotificationTime\":\"11/23/2020 5:06:39 PM\",\"Announced\":\"True\",\"Retrieved\":\"False\",\"Description\":\"RETURN NOTIFICATION FOR RETURN FILE ID: 9999\"},{\"@ID\":\"2\",\"NotificationID\":\"67\",\"NotificationTime\":\"11/23/2020 5:08:08 PM\",\"Announced\":\"True\",\"Retrieved\":\"False\",\"Description\":\"RETURN NOTIFICATION FOR RETURN FILE ID: 9999\"},{\"@ID\":\"3\",\"NotificationID\":\"71\",\"NotificationTime\":\"12/2/2020 2:12:02 PM\",\"Announced\":\"True\",\"Retrieved\":\"False\",\"Description\":\"RETURN NOTIFICATION FOR RETURN FILE ID: 9999\"}]}}}}"
+}
+```
+
+This endpoint Searchs bank Clearing Notifications.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearings/ShowReturnNotificationList`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device's Guid.
+NotificationDateBegin | string | Mandatory | Notification Date Begin.
+NotificationDateEnd | string | Mandatory | Notification Date End.
+
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Search bank Clearing Notifications Details
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void ShowReturnNotificationDetails()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/BankClearings/ShowReturnNotificationDetails");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    DeviceGuid = "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+                    NotificationId = "66"
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "DeviceGuid": "0e51ea3e-56ff-49e6-9d72-39f2058774a1",
+    "NotificationId": "66"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "summary": {
+        "error": "",
+        "message": "",
+        "requestCount": 1,
+        "successCount": 1,
+        "failCount": 0,
+        "timeStamp": "11/16/2021 5:10:39 PM",
+        "executeTime": 0.0
+    },
+    "items": [
+        {
+            "messageXml": "<Result ID=\"1\"><TransactionID>22346</TransactionID><ReturnDate>11/23/2020 5:07:00 PM</ReturnDate><ReturnCode>R01</ReturnCode><ReturnDesc>INSUFFICIENT FUNDS</ReturnDesc><CustomerID>5c9aa8e8-38d3-44c8-a97e-637ccdb7fc3a</CustomerID></Result>",
+            "messageJson": "{\"Result\":{\"@ID\":\"1\",\"TransactionID\":\"22346\",\"ReturnDate\":\"11/23/2020 5:07:00 PM\",\"ReturnCode\":\"R01\",\"ReturnDesc\":\"INSUFFICIENT FUNDS\",\"CustomerID\":\"5c9aa8e8-38d3-44c8-a97e-637ccdb7fc3a\"}}",
+            "transactionId": "22346",
+            "returnDate": "2020-11-23T17:07:00",
+            "returnCode": "R01",
+            "returnDesc": "INSUFFICIENT FUNDS",
+            "customerId": "5c9aa8e8-38d3-44c8-a97e-637ccdb7fc3a"
+        }
+    ],
+    "messageXml": "<?xml version='1.0'?>\n<BOPRequest>\n<ResponseSummary>\n<Error></Error>\n<Message></Message>\n<RequestCount>1</RequestCount>\n<SuccessCount>1</SuccessCount>\n<FailCount>0</FailCount>\n<TimeStamp>11/16/2021 5:10:39 PM</TimeStamp>\n<ExecuteTime>0</ExecuteTime>\n</ResponseSummary>\n<Request ID=\"1\">\n<RequestType>ShowReturnNotificationDetails</RequestType>\n<Status>Success</Status>\n<StatusMessage/>\n<TimeStamp>11/16/2021 5:10:39 PM</TimeStamp>\n<Results Count=\"1\">\n<Result ID=\"1\">\n<TransactionID>22346</TransactionID>\n<ReturnDate>11/23/2020 5:07:00 PM</ReturnDate>\n<ReturnCode>R01</ReturnCode>\n<ReturnDesc>INSUFFICIENT FUNDS</ReturnDesc>\n<CustomerID>5c9aa8e8-38d3-44c8-a97e-637ccdb7fc3a</CustomerID>\n</Result>\n</Results>\n</Request>\n</BOPRequest>\n",
+    "messageJson": "{\"BOPRequest\":{\"ResponseSummary\":{\"Error\":\"\",\"Message\":\"\",\"RequestCount\":\"1\",\"SuccessCount\":\"1\",\"FailCount\":\"0\",\"TimeStamp\":\"11/16/2021 5:10:39 PM\",\"ExecuteTime\":\"0\"},\"Request\":{\"@ID\":\"1\",\"RequestType\":\"ShowReturnNotificationDetails\",\"Status\":\"Success\",\"StatusMessage\":null,\"TimeStamp\":\"11/16/2021 5:10:39 PM\",\"Results\":{\"@Count\":\"1\",\"Result\":{\"@ID\":\"1\",\"TransactionID\":\"22346\",\"ReturnDate\":\"11/23/2020 5:07:00 PM\",\"ReturnCode\":\"R01\",\"ReturnDesc\":\"INSUFFICIENT FUNDS\",\"CustomerID\":\"5c9aa8e8-38d3-44c8-a97e-637ccdb7fc3a\"}}}}}"
+}
+```
+
+This endpoint Searchs bank Clearing Notifications Details.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearings/ShowReturnNotificationDetails`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device's Guid.
+NotificationId | string | Mandatory | Notification Id.
+
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+## Search bank Clearing Chargebacks
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void Chargebacks()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/BankClearings/ShowChargebacks");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    DeviceGuid = "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+                    ChargeBackDateBegin = "2020-11-11", 
+                    ChargeBackDateEnd = "2021-11-11", 
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "DeviceGuid": "0e51ea3e-56ff-49e6-9d72-39f2058774a1",
+    "ChargeBackDateBegin": "2020-11-11",
+    "ChargeBackDateEnd": "2021-11-11"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "summary": {
+        "error": "",
+        "message": "",
+        "requestCount": 1,
+        "successCount": 1,
+        "failCount": 0,
+        "timeStamp": "11/16/2021 5:23:17 PM",
+        "executeTime": 0.0
+    },
+    "items": [],
+    "messageXml": "<?xml version='1.0'?>\n<BOPRequest>\n<ResponseSummary>\n<Error></Error>\n<Message></Message>\n<RequestCount>1</RequestCount>\n<SuccessCount>1</SuccessCount>\n<FailCount>0</FailCount>\n<TimeStamp>11/16/2021 5:23:17 PM</TimeStamp>\n<ExecuteTime>0</ExecuteTime>\n</ResponseSummary>\n<Request ID=\"1\">\n<RequestType>ShowChargebacks</RequestType>\n<Status>Success</Status>\n<StatusMessage/>\n<TimeStamp>11/16/2021 5:23:17 PM</TimeStamp>\n<Results Count=\"0\">\n</Results>\n</Request>\n</BOPRequest>\n",
+    "messageJson": "{\"BOPRequest\":{\"ResponseSummary\":{\"Error\":\"\",\"Message\":\"\",\"RequestCount\":\"1\",\"SuccessCount\":\"1\",\"FailCount\":\"0\",\"TimeStamp\":\"11/16/2021 5:23:17 PM\",\"ExecuteTime\":\"0\"},\"Request\":{\"@ID\":\"1\",\"RequestType\":\"ShowChargebacks\",\"Status\":\"Success\",\"StatusMessage\":null,\"TimeStamp\":\"11/16/2021 5:23:17 PM\",\"Results\":{\"@Count\":\"0\"}}}}"
+}
+```
+
+This endpoint searchs bank Clearing Chargebacks.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearings/ShowChargebacks`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device's Guid.
+ChargeBackDateBegin | string | Mandatory | ChargeBack Date Begin.
+ChargeBackDateEnd  | string | Mandatory | ChargeBack Date Begin.
+
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+## Search bank Clearing NOCs
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Search
+    {
+        public static void Chargebacks()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Search/BankClearings/ShowNOCList");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var search = new
+                {
+                    DeviceGuid = "a9c0505b-a087-44b1-b9cd-0e7f75715d4d",
+                    NocDateBegin = "2020-11-11", 
+                    NocDateEnd = "2021-11-11", 
+                };
+
+                string json = JsonConvert.SerializeObject(search);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "DeviceGuid": "0e51ea3e-56ff-49e6-9d72-39f2058774a1",
+    "NocDateBegin": "2020-11-11",
+    "NocDateEnd": "2021-11-11"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "summary": {
+        "error": "",
+        "message": "",
+        "requestCount": 1,
+        "successCount": 1,
+        "failCount": 0,
+        "timeStamp": "11/16/2021 5:23:17 PM",
+        "executeTime": 0.0
+    },
+    "items": [],
+    "messageXml": "<?xml version='1.0'?>\n<BOPRequest>\n<ResponseSummary>\n<Error></Error>\n<Message></Message>\n<RequestCount>1</RequestCount>\n<SuccessCount>1</SuccessCount>\n<FailCount>0</FailCount>\n<TimeStamp>11/16/2021 5:23:17 PM</TimeStamp>\n<ExecuteTime>0</ExecuteTime>\n</ResponseSummary>\n<Request ID=\"1\">\n<RequestType>ShowChargebacks</RequestType>\n<Status>Success</Status>\n<StatusMessage/>\n<TimeStamp>11/16/2021 5:23:17 PM</TimeStamp>\n<Results Count=\"0\">\n</Results>\n</Request>\n</BOPRequest>\n",
+    "messageJson": "{\"BOPRequest\":{\"ResponseSummary\":{\"Error\":\"\",\"Message\":\"\",\"RequestCount\":\"1\",\"SuccessCount\":\"1\",\"FailCount\":\"0\",\"TimeStamp\":\"11/16/2021 5:23:17 PM\",\"ExecuteTime\":\"0\"},\"Request\":{\"@ID\":\"1\",\"RequestType\":\"ShowChargebacks\",\"Status\":\"Success\",\"StatusMessage\":null,\"TimeStamp\":\"11/16/2021 5:23:17 PM\",\"Results\":{\"@Count\":\"0\"}}}}"
+}
+```
+
+This endpoint searchs bank Clearing NOCs.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Search/BankClearings/ShowNOCList`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Json Body:
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device's Guid.
+NocDateBegin | string | Mandatory | Noc Date Begin.
+NocDateEnd | string | Mandatory | Noc Date Begin.
+
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
