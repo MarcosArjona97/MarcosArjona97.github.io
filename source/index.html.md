@@ -7645,3 +7645,2869 @@ guid | Batch’s guid to get
 <aside class="success">
 Remember you will need to use an authentication token or the API Key in the header request for every transaction.
 </aside>
+
+# Invoice Customer
+
+## Create invoice customer
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceCustomer
+    {
+        public static void CreateInvoiceCustomer()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/InvoiceCustomers");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var invoiceCustomer = new
+                {
+                    MerchantGuid = "24639b5f-f881-45dc-966c-4beece954e6c",
+                    CompanyName = "Incutex",
+                    FirstName = "John",
+                    LastName = "Lock",
+                    Address1 = "108 8th Av.",
+                    Address2 = "8th Floor",
+                    Zip = "10008",
+                    City = "New York",
+                    State = "NY",
+                    PersonalPhone = "9727414574",
+                    WorkPhone = "9177563046",
+                    Fax = "8004578796",
+                    Email = "john.lock@mailinator.com"
+                };
+
+                string json = JsonConvert.SerializeObject(invoiceCustomer);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+	"MerchantGuid" : "24639b5f-f881-45dc-966c-4beece954e6c",
+	"CompanyName" : "Incutex",
+	"FirstName": "John",
+	"LastName": "Lock",
+	"Address1": "108 8th Av.",
+	"Address2": "8th Floor",
+	"Zip": "10008",
+	"City": "New York",
+	"State": "NY",
+	"PersonalPhone" : "9727414574",
+	"WorkPhone" : "9177563046",
+	"Fax" : "8004578796",
+	"Email": "john.lock@mailinator.com"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "33524364-727a-422b-8bbe-5eab1a849e82",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "customerCode": "LJ7482",
+    "companyName": "Incutex",
+    "firstName": "John",
+    "lastName": "Lock",
+    "address1": "108 8th Av.",
+    "address2": "8th Floor",
+    "zip": "10008",
+    "city": "New York",
+    "state": "NY",
+    "personalPhone": "9727414574",
+    "workPhone": "9177563046",
+    "fax": "8004578796",
+    "email": "john.lock@mailinator.com",
+    "invoiceNumber": "000001"
+}
+```
+
+This endpoint creates a invoice customer.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/InvoiceCustomers`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant’s Guid.
+CompanyName | string | Optional | Company Name.
+FirstName | string |  Optional | User’s first name.
+LastName | string | Optional | User’s last name.
+Address1 | string | Optional | User’s address.
+Address2 | string | Optional | User’s address line 2.
+City | string | Optional | User’s city.
+State | string | Optional | User’s short name state. The ISO 3166-2 CA and US state or province code of a user. Length = 2.
+Zip | string | Optional | User’s zipcode. Length = 5.
+PersonalPhone | string | Optional | User’s phone number. The phone number must be syntactically correct. For example, 4152345678.
+WorkPhone | string | Optional | User’s phone number. The phone number must be syntactically correct. For example, 4152345678.
+Fax | string | Optional | User’s phone number. The phone number must be syntactically correct. For example, 4152345678.
+Email | string | Optional | User’s valid email address
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Update invoice customer
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceCustomer
+    {
+        public static void UpdateInvoiceCustomer()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/InvoiceCustomers/33524364-727a-422b-8bbe-5eab1a849e82");
+                request.ContentType = "text/json";
+                request.Method = "PUT";
+
+                var invoiceCustomer = new
+                {
+                    CompanyName = "Incutex",
+                    FirstName = "John",
+                    LastName = "Lock",
+                    Address1 = "108 8th Av.",
+                    Address2 = "8th Floor",
+                    Zip = "10008",
+                    City = "New York",
+                    State = "NY",
+                    PersonalPhone = "9727414574",
+                    WorkPhone = "9177563046",
+                    Fax = "8004578796",
+                    Email = "john.lock@mailinator.com"
+                };
+
+                string json = JsonConvert.SerializeObject(invoiceCustomer);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+  "CompanyName" : "Incutex",
+  "FirstName": "John",
+  "LastName": "Lock",
+  "Address1": "108 8th Av.",
+  "Address2": "8th Floor",
+  "Zip": "10008",
+  "City": "New York",
+  "State": "NY",
+  "PersonalPhone" : "9727414574",
+  "WorkPhone" : "9177563046",
+  "Fax" : "8004578796",
+  "Email": "john.lock@mailinator.com"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "33524364-727a-422b-8bbe-5eab1a849e82",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "customerCode": "LJ7482",
+    "companyName": "Incutex",
+    "firstName": "John",
+    "lastName": "Lock",
+    "address1": "108 8th Av.",
+    "address2": "8th Floor",
+    "zip": "10008",
+    "city": "New York",
+    "state": "NY",
+    "personalPhone": "9727414574",
+    "workPhone": "9177563046",
+    "fax": "8004578796",
+    "email": "john.lock@mailinator.com",
+    "invoiceNumber": "000001"
+}
+```
+
+This endpoint updates a invoice customer.
+
+### HTTP Request
+
+`PUT https://sandbox.choice.dev/api/v1/InvoiceCustomers/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Invoice customer’s guid to update
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+CompanyName | string | Optional | Company Name.
+FirstName | string |  Optional | User’s first name.
+LastName | string | Optional | User’s last name.
+Address1 | string | Optional | User’s address.
+Address2 | string | Optional | User’s address line 2.
+City | string | Optional | User’s city.
+State | string | Optional | User’s short name state. The ISO 3166-2 CA and US state or province code of a user. Length = 2.
+Zip | string | Optional | User’s zipcode. Length = 5.
+PersonalPhone | string | Optional | User’s phone number. The phone number must be syntactically correct. For example, 4152345678.
+WorkPhone | string | Optional | User’s phone number. The phone number must be syntactically correct. For example, 4152345678.
+Fax | string | Optional | User’s phone number. The phone number must be syntactically correct. For example, 4152345678.
+Email | string | Optional | User’s valid email address
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Get invoice customer
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceCustomer
+    {
+        public static void GetInvoiceCustomer()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/InvoiceCustomers/33524364-727a-422b-8bbe-5eab1a849e82");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "33524364-727a-422b-8bbe-5eab1a849e82",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "customerCode": "LJ7482",
+    "companyName": "Incutex",
+    "firstName": "John",
+    "lastName": "Lock",
+    "address1": "108 8th Av.",
+    "address2": "8th Floor",
+    "zip": "10008",
+    "city": "New York",
+    "state": "NY",
+    "personalPhone": "9727414574",
+    "workPhone": "9177563046",
+    "fax": "8004578796",
+    "email": "john.lock@mailinator.com",
+    "invoiceNumber": "000001"
+}
+```
+
+This endpoint gets a invoice customer.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/InvoiceCustomers/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Invoice customer’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+## Get invoice customer by Merchant
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceCustomer
+    {
+        public static void GetInvoiceCustomerByMerchant()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/24639b5f-f881-45dc-966c-4beece954e6c/InvoiceCustomers");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+[
+    {
+        "guid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+        "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "customerCode": "NA1530",
+        "companyName": "Incutex",
+        "firstName": "Max",
+        "lastName": "Tomassi",
+        "address1": "Belgrano 383",
+        "zip": "10016",
+        "city": "New York",
+        "state": "NY",
+        "country": "United States",
+        "province": "",
+        "personalPhone": "",
+        "email": "maxduplessy@mailinator.com",
+        "invoiceNumber": "000001",
+        "shippingAddresses": [
+            {
+                "isDeleted": false,
+                "guid": "e45e0464-39c8-4d87-b1da-7bef8b251f29",
+                "address1": "Belgrano 383",
+                "zip": "10016",
+                "city": "New York",
+                "state": "NY",
+                "country": "United States",
+                "province": ""
+            }
+        ]
+    },
+    {
+        "guid": "e79ec8b0-dbd3-4be0-bf4e-8c12c632be7c",
+        "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "customerCode": "TD1627",
+        "companyName": "Incutex",
+        "firstName": "John",
+        "lastName": "Lock",
+        "address1": "108 8th Av.",
+        "address2": "8th Floor",
+        "zip": "10008",
+        "city": "New York",
+        "state": "NY",
+        "personalPhone": "9727414574",
+        "workPhone": "9177563046",
+        "fax": "8004578796",
+        "email": "john.lock@mailinator.com",
+        "invoiceNumber": "000001"
+    },
+    {
+        "guid": "33524364-727a-422b-8bbe-5eab1a849e82",
+        "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "customerCode": "LJ7482",
+        "companyName": "Incutex",
+        "firstName": "John",
+        "lastName": "Lock",
+        "address1": "108 8th Av.",
+        "address2": "8th Floor",
+        "zip": "10008",
+        "city": "New York",
+        "state": "NY",
+        "personalPhone": "9727414574",
+        "workPhone": "9177563046",
+        "fax": "8004578796",
+        "email": "john.lock@mailinator.com",
+        "invoiceNumber": "000001"
+    }
+]
+```
+
+This endpoint gets a invoice customer.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/Invoice/<merchantGuid>/InvoiceCustomers`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+merchantGuid | Merchant’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+# Invoice
+
+## Create invoice
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Invoice
+    {
+        public static void CreateInvoice()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var invoice = new
+                {
+                    MerchantGuid = "24639b5f-f881-45dc-966c-4beece954e6c",
+                    InvoiceCustomerGuid = "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+                    InvoiceNumber = "000006",
+                    OrderNumber = "000006",
+                    PaymentTerm = "Due on Receipt",
+                    DueDate = "11/26/2020",
+                    Details = new Detail[]
+                    {
+                        new Detail{
+                             ItemDescription = "Wine Malbec",
+                             ItemName = "Wine Malbec",
+                             Rate = 14.78,
+                             Quantity = 8
+                        },
+                        new Detail{
+                             ItemDescription = "Rum",
+                             ItemName = "Rum",
+                             Rate = 9.85,
+                             Quantity = 4
+                        },
+                        new Detail{
+                             ItemDescription = "Brandy",
+                             ItemName = "Brandy",
+                             Rate = 11.80,
+                             Quantity = 2
+                        },
+                        new Detail{
+                             ItemDescription = "Cigars",
+                             ItemName = "Cigars",
+                             Rate = 44.89,
+                             Quantity = 3
+                        }
+                    },
+                    DiscountType = "Fixed",
+                    DiscountValue = 5.00,
+                    TaxZip = "10016",
+                    TaxAmount = 27.5932625,
+                    TaxRate = 8.875,
+                    Note = "For september services",
+                    TermsAndConditions = "The ones you accepted when you clicked two pages ago",
+                    SendStatus = "Scheduled To be Sent",
+                    SendDate = "11/25/2020",
+                    InvoiceRecipientEmail = "maxduplessy@mailinator.com",
+                    OtherRecipients = "maxduplessy@mailinator.com, maxduplessy123@mailinator.com",
+                    SendBySMS = true,
+                    SendToPhoneNumber = "9174355176",
+                    SendToOthersNumber ="6384910738, 9174607489"
+                };
+
+                string json = JsonConvert.SerializeObject(invoice);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "invoiceCustomerGuid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+    "invoiceNumber": "000006",
+    "orderNumber": "000006",
+    "paymentTerm": "Due on Receipt",
+    "dueDate": "11/26/2020",
+    "details": [
+        {
+            "itemName": "Wine Malbec",
+            "itemDescription": "",
+            "quantity": 8,
+            "rate": "14.78"
+        },
+        {
+            "itemName": "Rum",
+            "itemDescription": "",
+            "quantity": 4,
+            "rate": "9.85"
+        },
+        {
+            "itemName": "Brandy",
+            "itemDescription": "",
+            "quantity": 2,
+            "rate": "11.80"
+        },
+        {
+            "itemName": "Cigars",
+            "itemDescription": "",
+            "quantity": 3,
+            "rate": "44.89"
+        }
+    ],
+    "discountType": "Fixed",
+    "discountValue": "5",
+    "taxZip": "10016",
+    "taxRate": 8.875,
+    "taxAmount": 27.5932625,
+    "note": "For september services",
+    "termsAndConditions": "The ones you accepted when you clicked two pages ago",
+    "sendStatus": "Scheduled To be Sent",
+    "sendDate": "11/25/2020",
+    "invoiceRecipientEmail": "maxduplessy@mailinator.com",
+    "sendToPhoneNumber": "9887555656",
+    "sendBySMS": true
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+    "timeStamp": "2020-11-25T09:54:46.21-06:00",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "invoiceCustomerGuid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+    "sendDate": "2020-11-25T00:00:00",
+    "sendStatus": "Scheduled To be Sent",
+    "paymentStatus": "Scheduled To be Sent",
+    "invoiceRecipientEmail": "maxduplessy@mailinator.com",
+    "paymentTerm": "Due on Receipt",
+    "dueDate": "2020-11-25T09:54:46.2",
+    "invoiceNumber": "000006",
+    "orderNumber": "000006",
+    "amountSubTotal": 315.91,
+    "amountDueTotal": 338.50,
+    "remainingBalance": 0.0,
+    "amountDiscounted": 5.00,
+    "discountValue": 5.00,
+    "discountType": "Fixed",
+    "taxRate": 8.87,
+    "taxAmount": 27.59,
+    "taxZip": "10016",
+    "note": "For september services",
+    "termsAndConditions": "The ones you accepted when you clicked two pages ago",
+    "extensionHostedPaymentPageRequestToken": "00000000-0000-0000-0000-000000000000",
+    "details": [
+        {
+            "guid": "f2ce15be-a6b7-4106-8660-ffd88e4219bc",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Wine Malbec",
+            "itemDescription": "",
+            "rate": 14.78,
+            "quantity": 8,
+            "amount": 118.24,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 118.24
+        },
+        {
+            "guid": "c9d70ca3-a571-4f5b-bb86-d52b9e28c298",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Rum",
+            "itemDescription": "",
+            "rate": 9.85,
+            "quantity": 4,
+            "amount": 39.40,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 39.40
+        },
+        {
+            "guid": "23074f19-969f-48d0-b2d4-99ffd2884001",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Brandy",
+            "itemDescription": "",
+            "rate": 11.80,
+            "quantity": 2,
+            "amount": 23.60,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 23.60
+        },
+        {
+            "guid": "0ac11bf0-1e81-4059-bb79-41e46ecbf4c1",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Cigars",
+            "itemDescription": "",
+            "rate": 44.89,
+            "quantity": 3,
+            "amount": 134.67,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 134.67
+        }
+    ],
+    "reminders": [
+        {
+            "guid": "21b7cce9-8940-47d0-b2f9-1d5c3cbe194c",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "reminderType": "5 days after due date",
+            "isActive": true,
+            "isCompleted": false,
+            "reminderDate": "2020-11-30T09:54:46.2"
+        }
+    ],
+    "merchant": {
+        "guid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "mid": "888000002849",
+        "allowOpenButton": false,
+        "recurringBillingSettings": [
+            {
+                "numReAttempt": 1,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 2,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 3,
+                "nameDayOfWeek": "Friday"
+            }
+        ],
+        "dba": "326Nothing",
+        "legalName": "326Nothing",
+        "adminUserGuid": "fad491cb-ac86-4250-ab34-ac8be77ee659",
+        "email": "326Nothing@mailinator.com",
+        "phone": "5656566886",
+        "address1": "Belgrano 383",
+        "city": "New York",
+        "state": "NY",
+        "zipcode": "10016",
+        "logoUrl": "https://res.cloudinary.com/choice/image/upload/v1516126617/uxuxkm3odb6lltibyeyj.png",
+        "defaultAllowsSurchargeOtherDevice": false,
+        "reAttemptRB": true,
+        "logoName": "mariano.png",
+        "status": "Merchant - Active",
+        "merchantOwners": [
+            {
+                "guid": "04ba4b19-e671-4c53-9951-1647b8d2fffa",
+                "firstName": "max",
+                "lastName": "tomassi",
+                "email": "Alpinstar@mailinator.com",
+                "phone": "5454354455",
+                "address1": "Belgrano 383",
+                "city": "new york",
+                "state": "NY",
+                "zipcode": "10016",
+                "country": "US",
+                "status": "MerchantOwner - Active"
+            }
+        ]
+    },
+    "invoiceCustomer": {
+        "guid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+        "merchantGuid": "00000000-0000-0000-0000-000000000000",
+        "customerCode": "NA1530",
+        "companyName": "Incutex",
+        "firstName": "Max",
+        "lastName": "Tomassi",
+        "address1": "Belgrano 383",
+        "zip": "10016",
+        "city": "New York",
+        "state": "NY",
+        "country": "United States",
+        "province": "",
+        "personalPhone": "",
+        "email": "maxduplessy@mailinator.com",
+        "invoiceNumber": "000001"
+    },
+    "sendBySMS": true,
+    "sendToPhoneNumber": "9887555656",
+    "recurringBilling": []
+}
+```
+
+This endpoint creates a invoice.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Invoice`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+MerchantGuid | string | Mandatory | Merchant's Guid.
+InvoiceCustomerGuid | string | Mandatory | InvoiceCustomer's Guid.
+InvoiceNumber | string |  Mandatory | Invoice Number.
+OrderNumber | string |  Optional | Order number. Length = 30.
+PaymentTerm | string | Optional | The term of payments.<br><br>Allowed values:<br><br>**1. Custom**<br>**2. Due on Receipt** <br>**3. Due end of month** <br>**4. Due end of next month** <br>**5. Net 15** <br>**6. Net 30** <br>**7. Net 45** <br>**8. Net 60**
+DueDate | date | Optional | Due Date.<br><br>Allowed format:<br><br>MM-DD-YYYY.<br>For example: 05-30-2018.
+DueDateSpecial | date | Optional | Due Date for today.<br><br>Allowed format:<br><br>MM-DD-YYYY.<br>For example: 05-30-2018.
+DiscountType | string | Optional | Discount Type.<br><br>Allowed values:<br><br>**1. Fixed**<br>**2. Percentage**
+DiscountValue | decimal | Optional | Discount Value.
+TaxZip | string | Optional | Tax Zip.
+TaxAmount | decimal | Optional | Tax Amount.
+TaxRate | decimal | Optional | Tax Rate.
+Note | string | Optional | Note.
+TermsAndConditions | string | Optional | Terms And Conditions.
+SendStatus | string | Optional | Send Status.<br><br>Allowed values:<br><br>**1. Draft**<br>**2. Scheduled To be Sent** <br>**3. Scheduled To be SentEMAIL** <br>**4. Scheduled To be SentSMS**
+SendDate | date | Optional | Send Date.<br><br>Allowed format:<br><br>MM-DD-YYYY.<br>For example: 05-30-2018.
+InvoiceRecipientEmail | string | Optional | Valid email address.
+SendBySMS | boolean | Optional | True or False.
+SendToPhoneNumber | string | Optional | Phone number. The phone number must be syntactically correct. For example, 4152345678.
+Details | object[] | Mandatory | Details.
+ |  | 
+**Details** | array of detail | 
+ItemDescription | string | Optional | Item Description.
+ItemName | string | Optional | Item Name.
+Rate | decimal | Optional | Rate.
+Quantity | integer | Optional | Quantity.
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Update invoice
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Invoice
+    {
+        public static void UpdateInvoice()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/2541692d-958f-46b7-8ca7-a127016ea3b6");
+                request.ContentType = "text/json";
+                request.Method = "PUT";
+
+                var invoice = new
+                {
+                    OrderNumber = "000006",
+                    PaymentTerm = "Due on Receipt",
+                    DueDate = "11/26/2020",
+                    DiscountType = "Fixed",
+                    DiscountValue = "5",
+                    TaxZip = "10016",
+                    TaxRate = 8.875,
+                    TaxAmount = 27.5932625,
+                    Note = "For september services",
+                    TermsAndConditions = "The ones you accepted when you clicked two pages ago",
+                    SendStatus = "Scheduled To be Sent",
+                    SendDate = "11/25/2020",
+                    InvoiceRecipientEmail = "maxduplessy@mailinator.com",
+                    SendToPhoneNumber = "9887555656",
+                    SendBySMS = true
+                };
+
+                string json = JsonConvert.SerializeObject(invoice);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "OrderNumber": "000006",
+    "PaymentTerm": "Due on Receipt",
+    "DueDate": "11/26/2020",
+    "DiscountType": "Fixed",
+    "DiscountValue": "5",
+    "TaxZip": "10016",
+    "TaxRate": 8.875,
+    "TaxAmount": 27.5932625,
+    "Note": "For september services",
+    "TermsAndConditions": "The ones you accepted when you clicked two pages ago",
+    "SendStatus": "Scheduled To be Sent",
+    "SendDate": "11/25/2020",
+    "InvoiceRecipientEmail": "maxduplessy@mailinator.com",
+    "SendToPhoneNumber": "9887555656",
+    "SendBySMS": true
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+    "timeStamp": "2020-11-25T09:54:46.21-06:00",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "invoiceCustomerGuid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+    "sendDate": "2020-11-25T00:00:00",
+    "sendStatus": "Scheduled To be Sent",
+    "paymentStatus": "Unpaid",
+    "invoiceRecipientEmail": "maxduplessy@mailinator.com",
+    "paymentTerm": "Due on Receipt",
+    "dueDate": "2020-11-25T13:21:30.91",
+    "invoiceNumber": "000006",
+    "orderNumber": "000006",
+    "amountSubTotal": 315.91,
+    "amountDueTotal": 338.49,
+    "remainingBalance": 0.0,
+    "amountDiscounted": 5.00,
+    "discountValue": 5.00,
+    "discountType": "Fixed",
+    "taxRate": 8.87,
+    "taxAmount": 27.59,
+    "taxZip": "10016",
+    "note": "For september services",
+    "termsAndConditions": "The ones you accepted when you clicked two pages ago",
+    "extensionHostedPaymentPageRequestToken": "00000000-0000-0000-0000-000000000000",
+    "details": [
+        {
+            "guid": "f2ce15be-a6b7-4106-8660-ffd88e4219bc",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Wine Malbec",
+            "itemDescription": "",
+            "rate": 14.78,
+            "quantity": 8,
+            "amount": 118.24,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 118.24
+        },
+        {
+            "guid": "c9d70ca3-a571-4f5b-bb86-d52b9e28c298",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Rum",
+            "itemDescription": "",
+            "rate": 9.85,
+            "quantity": 4,
+            "amount": 39.40,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 39.40
+        },
+        {
+            "guid": "23074f19-969f-48d0-b2d4-99ffd2884001",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Brandy",
+            "itemDescription": "",
+            "rate": 11.80,
+            "quantity": 2,
+            "amount": 23.60,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 23.60
+        },
+        {
+            "guid": "0ac11bf0-1e81-4059-bb79-41e46ecbf4c1",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Cigars",
+            "itemDescription": "",
+            "rate": 44.89,
+            "quantity": 3,
+            "amount": 134.67,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 134.67
+        }
+    ],
+    "reminders": [
+        {
+            "guid": "21b7cce9-8940-47d0-b2f9-1d5c3cbe194c",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "reminderType": "5 days after due date",
+            "isActive": true,
+            "isCompleted": false,
+            "reminderDate": "2020-11-30T13:21:30.91"
+        }
+    ],
+    "merchant": {
+        "guid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "mid": "888000002849",
+        "allowOpenButton": false,
+        "recurringBillingSettings": [
+            {
+                "numReAttempt": 1,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 2,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 3,
+                "nameDayOfWeek": "Friday"
+            }
+        ],
+        "dba": "326Nothing",
+        "legalName": "326Nothing",
+        "adminUserGuid": "fad491cb-ac86-4250-ab34-ac8be77ee659",
+        "email": "326Nothing@mailinator.com",
+        "phone": "5656566886",
+        "address1": "Belgrano 383",
+        "city": "New York",
+        "state": "NY",
+        "zipcode": "10016",
+        "logoUrl": "https://paybugstagestorage.blob.core.windows.net/images/C:%5Cinetpub%5CPayBugStage%5CApp_Data%5CBodyPart_4504fad2-18b5-48dc-9e91-20f81647485e",
+        "defaultAllowsSurchargeOtherDevice": false,
+        "reAttemptRB": true,
+        "logoName": "mariano.png",
+        "status": "Merchant - Active",
+        "merchantOwners": [
+            {
+                "guid": "04ba4b19-e671-4c53-9951-1647b8d2fffa",
+                "firstName": "max",
+                "lastName": "tomassi",
+                "email": "Alpinstar@mailinator.com",
+                "phone": "5454354455",
+                "address1": "Belgrano 383",
+                "city": "new york",
+                "state": "NY",
+                "zipcode": "10016",
+                "country": "US",
+                "status": "MerchantOwner - Active"
+            }
+        ]
+    },
+    "invoiceCustomer": {
+        "guid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+        "merchantGuid": "00000000-0000-0000-0000-000000000000",
+        "customerCode": "NA1530",
+        "companyName": "Incutex",
+        "firstName": "Max",
+        "lastName": "Tomassi",
+        "address1": "Belgrano 383",
+        "zip": "10016",
+        "city": "New York",
+        "state": "NY",
+        "country": "United States",
+        "province": "",
+        "personalPhone": "",
+        "email": "maxduplessy@mailinator.com",
+        "invoiceNumber": "000001"
+    },
+    "sendBySMS": true,
+    "sendToPhoneNumber": "9887555656",
+    "recurringBilling": []
+}
+```
+
+This endpoint updates a invoice.
+
+### HTTP Request
+
+`PUT https://sandbox.choice.dev/api/v1/Invoice/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Invoice’s guid to update
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+OrderNumber | string |  Optional | Order number. Length = 30.
+PaymentTerm | string | Optional | The term of payments.<br><br>Allowed values:<br><br>**1. Custom**<br>**2. Due on Receipt** <br>**3. Due end of month** <br>**4. Due end of next month** <br>**5. Net 15** <br>**6. Net 30** <br>**7. Net 45** <br>**8. Net 60**
+DueDate | date | Optional | Due Date.<br><br>Allowed format:<br><br>MM-DD-YYYY.<br>For example: 05-30-2018.
+DiscountType | string | Optional | Discount Type.<br><br>Allowed values:<br><br>**1. Fixed**<br>**2. Percentage**
+DiscountValue | decimal | Optional | Discount Value.
+TaxZip | string | Optional | Tax Zip.
+TaxAmount | decimal | Optional | Tax Amount.
+TaxRate | decimal | Optional | Tax Rate.
+Note | string | Optional | Note.
+TermsAndConditions | string | Optional | Terms And Conditions.
+SendStatus | string | Optional | Send Status.<br><br>Allowed values:<br><br>**1. Draft**<br>**2. Scheduled To be Sent** <br>**3. Scheduled To be SentEMAIL** <br>**4. Scheduled To be SentSMS**
+SendDate | date | Optional | Send Date.<br><br>Allowed format:<br><br>MM-DD-YYYY.<br>For example: 05-30-2018.
+InvoiceRecipientEmail | string | Optional | Valid email address.
+SendBySMS | boolean | Optional | True or False.
+SendToPhoneNumber | string | Optional | Phone number. The phone number must be syntactically correct. For example, 4152345678.
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Get invoice
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Invoice
+    {
+        public static void GetInvoice()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/2541692d-958f-46b7-8ca7-a127016ea3b6");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+    "timeStamp": "2020-11-25T09:54:46.21-06:00",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "invoiceCustomerGuid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+    "sendDate": "2020-11-25T00:00:00",
+    "sendStatus": "Scheduled To be Sent",
+    "paymentStatus": "Unpaid",
+    "invoiceRecipientEmail": "maxduplessy@mailinator.com",
+    "paymentTerm": "Due on Receipt",
+    "dueDate": "2020-11-25T13:21:30.91",
+    "invoiceNumber": "000006",
+    "orderNumber": "000006",
+    "amountSubTotal": 315.91,
+    "amountDueTotal": 338.49,
+    "remainingBalance": 0.0,
+    "amountDiscounted": 5.00,
+    "discountValue": 5.00,
+    "discountType": "Fixed",
+    "taxRate": 8.87,
+    "taxAmount": 27.59,
+    "taxZip": "10016",
+    "note": "For september services",
+    "termsAndConditions": "The ones you accepted when you clicked two pages ago",
+    "extensionHostedPaymentPageRequestToken": "e0b2ac6e-994c-4e65-888a-3cb3d1b7f974",
+    "extensionDisplayCreditCard": true,
+    "extensionDisplayAch": true,
+    "details": [
+        {
+            "guid": "f2ce15be-a6b7-4106-8660-ffd88e4219bc",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Wine Malbec",
+            "itemDescription": "",
+            "rate": 14.78,
+            "quantity": 8,
+            "amount": 118.24,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 118.24
+        },
+        {
+            "guid": "c9d70ca3-a571-4f5b-bb86-d52b9e28c298",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Rum",
+            "itemDescription": "",
+            "rate": 9.85,
+            "quantity": 4,
+            "amount": 39.40,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 39.40
+        },
+        {
+            "guid": "23074f19-969f-48d0-b2d4-99ffd2884001",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Brandy",
+            "itemDescription": "",
+            "rate": 11.80,
+            "quantity": 2,
+            "amount": 23.60,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 23.60
+        },
+        {
+            "guid": "0ac11bf0-1e81-4059-bb79-41e46ecbf4c1",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Cigars",
+            "itemDescription": "",
+            "rate": 44.89,
+            "quantity": 3,
+            "amount": 134.67,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 134.67
+        }
+    ],
+    "reminders": [
+        {
+            "guid": "21b7cce9-8940-47d0-b2f9-1d5c3cbe194c",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "reminderType": "5 days after due date",
+            "isActive": true,
+            "isCompleted": false,
+            "reminderDate": "2020-11-30T13:21:30.91"
+        }
+    ],
+    "merchant": {
+        "guid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "mid": "888000002849",
+        "allowOpenButton": false,
+        "recurringBillingSettings": [
+            {
+                "numReAttempt": 1,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 2,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 3,
+                "nameDayOfWeek": "Friday"
+            }
+        ],
+        "dba": "326Nothing",
+        "legalName": "326Nothing",
+        "adminUserGuid": "fad491cb-ac86-4250-ab34-ac8be77ee659",
+        "email": "326Nothing@mailinator.com",
+        "phone": "5656566886",
+        "address1": "Belgrano 383",
+        "city": "New York",
+        "state": "NY",
+        "zipcode": "10016",
+        "logoUrl": "https://paybugstagestorage.blob.core.windows.net/images/C:%5Cinetpub%5CPayBugStage%5CApp_Data%5CBodyPart_4504fad2-18b5-48dc-9e91-20f81647485e",
+        "defaultAllowsSurchargeOtherDevice": false,
+        "reAttemptRB": true,
+        "logoName": "mariano.png",
+        "status": "Merchant - Active",
+        "merchantOwners": [
+            {
+                "guid": "04ba4b19-e671-4c53-9951-1647b8d2fffa",
+                "firstName": "max",
+                "lastName": "tomassi",
+                "email": "Alpinstar@mailinator.com",
+                "phone": "5454354455",
+                "address1": "Belgrano 383",
+                "city": "new york",
+                "state": "NY",
+                "zipcode": "10016",
+                "country": "US",
+                "status": "MerchantOwner - Active"
+            }
+        ]
+    },
+    "invoiceCustomer": {
+        "guid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+        "merchantGuid": "00000000-0000-0000-0000-000000000000",
+        "customerCode": "NA1530",
+        "companyName": "Incutex",
+        "firstName": "Max",
+        "lastName": "Tomassi",
+        "address1": "Belgrano 383",
+        "zip": "10016",
+        "city": "New York",
+        "state": "NY",
+        "country": "United States",
+        "province": "",
+        "personalPhone": "",
+        "email": "maxduplessy@mailinator.com",
+        "invoiceNumber": "000001"
+    },
+    "sendBySMS": true,
+    "sendToPhoneNumber": "9887555656",
+    "recurringBilling": []
+}
+```
+
+This endpoint gets a invoice.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/Invoice/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Invoice’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Invoice Detail
+
+## Add invoice detail
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceDetail
+    {
+        public static void CreateInvoiceDetail()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/Detail");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var invoiceDetail = new
+                {
+                    InvoiceGuid = "4be52be2-bedf-4125-b7d5-2ed9ef8d6027",
+                    ItemDescription = "Sparkling Wine",
+                    Rate = 1.95,
+                    Quantity = 3
+                };
+
+                string json = JsonConvert.SerializeObject(invoiceDetail);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+	"invoiceGuid" : "2541692d-958f-46b7-8ca7-a127016ea3b6",
+	"ItemDescription":"Sparkling Wine",
+    "ItemName": "Sparkling Wine",
+	"Rate":1.95,
+	"Quantity": 3
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "965b4d54-d35d-414d-b0c9-991c6ca013e7",
+    "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+    "itemName": "Sparkling Wine",
+    "itemDescription": "Sparkling Wine",
+    "rate": 1.95,
+    "quantity": 3,
+    "amount": 5.85,
+    "isDeleted": false,
+    "discounType": null,
+    "discountedAmount": 0.00,
+    "finallyAmount": 5.85
+}
+```
+
+This endpoint add a invoice detail.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Invoice/Detail`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+InvoiceGuid | string | Mandatory | Invoice's Guid.
+ItemDescription | string | Mandatory | Item Description.
+ItemName | string | Optional | Item Name.
+Rate | decimal |  Mandatory | Rate.
+Quantity | integer |  Mandatory | Quantity.
+
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Create invoice details list
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceDetail
+    {
+        public static void CreateInvoiceDetailsList()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/Detail/all/2541692d-958f-46b7-8ca7-a127016ea3b6");
+                request.ContentType = "text/json";
+                request.Method = "PUT";
+
+                var invoiceDetailsList = new Detail[]
+                {
+                    new Detail{
+                         ItemDescription = "Red Wine",
+                         ItemName = "Red Wine",
+                         Rate = 14.78,
+                         Quantity = 8
+                    },
+                    new Detail{
+                         ItemDescription = "Purple Wine",
+                         ItemName = "Purple Wine",
+                         Rate = 9.85,
+                         Quantity = 4
+                    }
+                };
+
+                string json = JsonConvert.SerializeObject(invoiceDetailsList);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+[
+    {
+        "ItemDescription": "Red Wine",
+        "ItemName": "Red Wine",
+        "Rate": 1.95,
+        "Quantity": 3
+    },
+    {
+        "ItemDescription": "Purple Wine",
+        "ItemName": "Purple Wine",
+        "Rate": 7.55,
+        "Quantity": 1
+    }
+]
+```
+
+> Json Example Response:
+
+```json
+{
+    "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+    "timeStamp": "2020-11-25T09:54:46.21-06:00",
+    "merchantGuid": "24639b5f-f881-45dc-966c-4beece954e6c",
+    "invoiceCustomerGuid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+    "sendDate": "2020-11-25T00:00:00",
+    "sendStatus": "Scheduled To be Sent",
+    "paymentStatus": "Scheduled To be Sent",
+    "invoiceRecipientEmail": "maxduplessy@mailinator.com",
+    "paymentTerm": "Due on Receipt",
+    "dueDate": "2020-11-25T09:54:46.2",
+    "invoiceNumber": "000006",
+    "orderNumber": "000006",
+    "amountSubTotal": 315.91,
+    "amountDueTotal": 338.50,
+    "remainingBalance": 0.0,
+    "amountDiscounted": 5.00,
+    "discountValue": 5.00,
+    "discountType": "Fixed",
+    "taxRate": 8.87,
+    "taxAmount": 27.59,
+    "taxZip": "10016",
+    "note": "For september services",
+    "termsAndConditions": "The ones you accepted when you clicked two pages ago",
+    "extensionHostedPaymentPageRequestToken": "00000000-0000-0000-0000-000000000000",
+    "details": [
+        {
+            "guid": "23074f19-969f-48d0-b2d4-99ffd2884001",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Brandy",
+            "itemDescription": "",
+            "rate": 11.80,
+            "quantity": 2,
+            "amount": 23.60,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 23.60
+        },
+        {
+            "guid": "0ac11bf0-1e81-4059-bb79-41e46ecbf4c1",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Cigars",
+            "itemDescription": "",
+            "rate": 44.89,
+            "quantity": 3,
+            "amount": 134.67,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 134.67
+        },
+                {
+            "guid": "f2ce15be-a6b7-4106-8660-ffd88e4219bc",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Red Wine",
+            "itemDescription": "",
+            "rate": 14.78,
+            "quantity": 8,
+            "amount": 118.24,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 118.24
+        },
+        {
+            "guid": "c9d70ca3-a571-4f5b-bb86-d52b9e28c298",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "itemName": "Purple Wine",
+            "itemDescription": "",
+            "rate": 9.85,
+            "quantity": 4,
+            "amount": 39.40,
+            "isDeleted": false,
+            "discountedAmount": 0.00,
+            "finallyAmount": 39.40
+        }
+    ],
+    "reminders": [
+        {
+            "guid": "21b7cce9-8940-47d0-b2f9-1d5c3cbe194c",
+            "invoiceGuid": "2541692d-958f-46b7-8ca7-a127016ea3b6",
+            "reminderType": "5 days after due date",
+            "isActive": true,
+            "isCompleted": false,
+            "reminderDate": "2020-11-30T09:54:46.2"
+        }
+    ],
+    "merchant": {
+        "guid": "24639b5f-f881-45dc-966c-4beece954e6c",
+        "mid": "888000002849",
+        "allowOpenButton": false,
+        "recurringBillingSettings": [
+            {
+                "numReAttempt": 1,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 2,
+                "nameDayOfWeek": "Friday"
+            },
+            {
+                "numReAttempt": 3,
+                "nameDayOfWeek": "Friday"
+            }
+        ],
+        "dba": "326Nothing",
+        "legalName": "326Nothing",
+        "adminUserGuid": "fad491cb-ac86-4250-ab34-ac8be77ee659",
+        "email": "326Nothing@mailinator.com",
+        "phone": "5656566886",
+        "address1": "Belgrano 383",
+        "city": "New York",
+        "state": "NY",
+        "zipcode": "10016",
+        "logoUrl": "https://res.cloudinary.com/choice/image/upload/v1516126617/uxuxkm3odb6lltibyeyj.png",
+        "defaultAllowsSurchargeOtherDevice": false,
+        "reAttemptRB": true,
+        "logoName": "mariano.png",
+        "status": "Merchant - Active",
+        "merchantOwners": [
+            {
+                "guid": "04ba4b19-e671-4c53-9951-1647b8d2fffa",
+                "firstName": "max",
+                "lastName": "tomassi",
+                "email": "Alpinstar@mailinator.com",
+                "phone": "5454354455",
+                "address1": "Belgrano 383",
+                "city": "new york",
+                "state": "NY",
+                "zipcode": "10016",
+                "country": "US",
+                "status": "MerchantOwner - Active"
+            }
+        ]
+    },
+    "invoiceCustomer": {
+        "guid": "c6697789-6b5d-4243-bb2c-91da084b6e4a",
+        "merchantGuid": "00000000-0000-0000-0000-000000000000",
+        "customerCode": "NA1530",
+        "companyName": "Incutex",
+        "firstName": "Max",
+        "lastName": "Tomassi",
+        "address1": "Belgrano 383",
+        "zip": "10016",
+        "city": "New York",
+        "state": "NY",
+        "country": "United States",
+        "province": "",
+        "personalPhone": "",
+        "email": "maxduplessy@mailinator.com",
+        "invoiceNumber": "000001"
+    },
+    "sendBySMS": true,
+    "sendToPhoneNumber": "9887555656",
+    "recurringBilling": []
+}
+```
+
+This endpoint create a invoice details list.
+
+### HTTP Request
+
+`PUT https://sandbox.choice.dev/api/v1/Invoice/Detail/all/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Invoice’s guid
+
+
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+ItemDescription | string | Mandatory | Item Description.
+Rate | decimal |  Mandatory | Rate.
+Quantity | integer |  Mandatory | Quantity.
+
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Invoice Reminder
+
+## Create invoice reminder
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceReminder
+    {
+        public static void CreateInvoiceReminder()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/Reminder");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var invoiceReminder = new
+                {
+                    InvoiceGuid = "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+                    ReminderType = "2 weeks after due date"
+                };
+
+                string json = JsonConvert.SerializeObject(invoiceReminder);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "InvoiceGuid" : "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+    "ReminderType" : "2 weeks after due date"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "a4e4278b-f2de-41d9-8da5-d0aabbf5a385",
+    "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+    "reminderType": "2 weeks after due date",
+    "isActive": true,
+    "isCompleted": false,
+    "reminderDate": "2019-08-08T00:00:00"
+}
+```
+
+This endpoint creates a invoice reminder.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Invoice/Reminder`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+InvoiceGuid | string | Mandatory | Invoice's Guid.
+ReminderType | string | Mandatory | Reminder Type.<br><br>Allowed values:<br><br>**1. X days before due date**<br>**2. 1 days before due date** <br>**3. 5 days before due date** <br>**4. 1 week before due date** <br>**5. 10 days before due date** <br>**6. 2 week before due date** <br><br>**7. X days after due date**<br>**8. 1 days after due date** <br>**9. 5 days after due date** <br>**10. 1 week after due date** <br>**11. 10 days after due date** <br>**12. 2 week after due date**
+ReminderDaysValue | byte | Optional | Reminder Days Value. Only with "X days before due date" or "X days after due date"
+
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Update invoice reminder
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceReminder
+    {
+        public static void UpdateInvoiceReminder()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/Reminder/a4e4278b-f2de-41d9-8da5-d0aabbf5a385/true");
+                request.ContentType = "text/json";
+                request.Method = "PUT";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response (PUT https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/true):
+
+```json
+{
+    "guid": "a4e4278b-f2de-41d9-8da5-d0aabbf5a385",
+    "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+    "reminderType": "2 weeks after due date",
+    "isActive": true,
+    "isCompleted": false,
+    "reminderDate": "2019-08-08T00:00:00"
+}
+```
+
+> Json Example Response (PUT https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/false):
+
+```json
+{
+    "guid": "a4e4278b-f2de-41d9-8da5-d0aabbf5a385",
+    "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+    "reminderType": "2 weeks after due date",
+    "isActive": false,
+    "isCompleted": false,
+    "reminderDate": "2019-08-08T00:00:00"
+}
+```
+
+This endpoint updates a invoice reminder.
+
+### HTTP Request
+
+`PUT https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/true`
+
+    or
+
+`PUT https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/false`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Reminder’s guid to update
+
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Get invoice reminder
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class InvoiceReminder
+    {
+        public static void GetInvoiceReminder()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Invoice/Reminder/d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf/true");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response (GET https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/true):
+
+```json
+[
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "1 day before due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "fbb2633f-0bf4-412b-a51e-edad3fb4b058",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "5 days before due date",
+        "isActive": true,
+        "isCompleted": false,
+        "reminderDate": "2019-07-20T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "1 week before due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "10 days before due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "2 weeks before due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "1 day after due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "cf7f8d0a-7540-43de-b637-09f7dec0a273",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "5 days after due date",
+        "isActive": true,
+        "isCompleted": false,
+        "reminderDate": "2019-07-30T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "1 week after due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "10 days after due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    },
+    {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "2 weeks after due date",
+        "isActive": false,
+        "isCompleted": false,
+        "reminderDate": "0001-01-01T00:00:00"
+    }
+]
+```
+
+> Json Example Response (GET https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/false):
+
+```json
+[
+    {
+        "guid": "fbb2633f-0bf4-412b-a51e-edad3fb4b058",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "5 days before due date",
+        "isActive": true,
+        "isCompleted": false,
+        "reminderDate": "2019-07-20T00:00:00"
+    },
+    {
+        "guid": "cf7f8d0a-7540-43de-b637-09f7dec0a273",
+        "invoiceGuid": "d5828cfd-12a6-4a7e-9be6-7c4b11f07dbf",
+        "reminderType": "5 days after due date",
+        "isActive": true,
+        "isCompleted": false,
+        "reminderDate": "2019-07-30T00:00:00"
+    }
+]
+```
+
+This endpoint gets a invoice reminder.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/true`
+
+    or
+
+`GET https://sandbox.choice.dev/api/v1/Invoice/Reminder/<guid>/false`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Invoice’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
