@@ -15307,6 +15307,213 @@ Go to `https://webportalsandbox.choice.dev/HostedPaymentPage/{{tempToken}}`
 
 
 
+# Payment Button
+
+## Payment Button
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Account
+    {
+        public static void PaymentButton()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/HostedPaymentPageRequests");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var paymentButton = new
+                {
+                    DeviceCreditCardGuid = "2a566893-4ad3-4063-9f64-13ff055b695a",
+                    Merchantname = "StarCoffe",
+                    Description = "coffe latte",
+                    Amount = 7.50,
+                    isButton = true,
+                    buttonLabel = "button coffe latte",
+                    OtherURL = "http://StarCoffe/other",
+                    SuccessURL = "http://StarCoffe/success",
+                    CancelURL = "http://StarCoffe/cancel",
+                    OtherInfo = "coffe latte express"
+                };
+
+                string json = JsonConvert.SerializeObject(paymentButton);
+
+                request.Headers.Add("Authorization", "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6EBqB7RFjVMuhmuPNWcYM7ozyMb3uaDe0gyDL_nMPESbuM5I4skBOYcUM4A06NO88CVV3yBYee7mWB1qT-YFu5A3KZJSfRIbTX9GZdrZpi-JuWsx-7GE9GIYrNJ29BpaQscTwxYDr67WiFlCCrsCqWnCPJUjCFRIrTDltz8vM15mlgjiO0y04ZACGOWNNErIVegX062oydV7SqumGJEbS9Av4gdy");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }  
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "DeviceCreditCardGuid": "2a566893-4ad3-4063-9f64-13ff055b695a",
+    "Merchantname": "StarCoffe",
+    "Description": "coffe latte",
+    "Amount": 7.50,
+    "isButton": true,
+    "buttonLabel": "button coffe latte",
+    "OtherURL": "http://StarCoffe/other",
+    "SuccessURL": "http://StarCoffe/success",
+    "CancelURL": "http://StarCoffe/cancel",
+    "OtherInfo": "coffe latte express"
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "merchantName": "StarCoffe",
+    "description": "coffe latte",
+    "amount": 7.50,
+    "otherUrl": "http://StarCoffe/other",
+    "successUrl": "http://StarCoffe/success",
+    "cancelUrl": "http://StarCoffe/cancel",
+    "tempToken": "cd5abbd7-501b-44dc-bb2d-013b3e971f1e",
+    "isButton": true,
+    "buttonLabel": "button coffe latte",
+    "status": "Button - Active",
+    "expiration": "2120-12-04T14:51:16.57",
+    "otherInfo": "coffe latte express"
+}
+```
+
+> **If the transaction gets approved the user will be redirected back to your site, sending a POST to the SuccessURL with the following parameters.**
+
+```json
+{
+ "PaymentType": "Credit Card",
+ "SaleGuid": "fa101801-1b87-495d-87b9-aeae745e9c85",
+ "TokenizedCard": "84yXtM3EcGze0103",
+ "OtherInfo": "",
+ "Status": "Success",
+ "AccountNumberLastFour": "1234",
+ "Receipt": "CHOICE MERCHANT SOLUTIONS<br/>8320 S HARDY DRIVE<br/>TEMPE AZ 85284<br/>07/07/2017 07:23:55<br/><br/>CREDIT - SALE<br/><br/>CARD # : **** **** **** 0103<br/>CARD TYPE : VISA<br/>Entry Mode : MANUAL<br/><br/>REF # : 13259222<br/>Invoice number : 13259222<br/>AUTH CODE : TAS869<br/>Subtotal:                       $13.50<br/>--------------------------------------<br/>Total:                          $13.50<br/>--------------------------------------<br/>Andres Ordonez<br/><br/>CUSTOMER ACKNOWLEDGES RECEIPT OF<br/>GOODS AND/OR SERVICES IN THE AMOUNT<br/>OF THE TOTAL SHOWN HEREON AND AGREES<br/>TO PERFORM THE OBLIGATIONS SET FORTH<br/>BY THE CUSTOMER`S AGREEMENT WITH THE<br/>ISSUER<br/>APPROVED<br/>Customer Copy<br/>"
+}
+```
+
+> **If the transaction goes wrong the user will be redirected back to your site, sending a POST to OtherURL with the following parameters**
+
+```json
+{
+ "Error": "The Sale could not be processed correctly. Error code D2020. Error message: CVV2 verification failed"
+}
+```
+
+
+
+Payment buttons allow you to seamlessly accept payments on your site.
+This feature will create a snippet of HTML code for a button you can add to your site allowing your customer to make a payment.
+
+### HTTP POST
+
+`POST https://sandbox.choice.dev/api/v1/HostedPaymentPageRequests`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type | M/C/O | Value
+--------- | ------- | ------- | -----------
+DeviceCreditCardGuid | string | Mandatory | Device's guid Credit Card.
+Merchantname | string | Mandatory | Merchant's name.
+Description | string | Optional first button, then mandatory | Items description.
+Amount | string | Optional first button, then mandatory | Items total amount.
+IsButton | boolean | Mandatory | Determines if the hosted payment page request will be used as a button (allows multiple payments for the same request or not).
+ButtonLabel | string | Mandatory | This will be the text shown on your button (For example: "Pay here", "Donate").
+OtherURL | string | Mandatory | Web page you want to redirect the user in case something failed.
+SuccessURL | string | Mandatory | Web page you want to redirect the user when transaction was successful.
+CancelURL | string | Mandatory | Web page you want to redirect the user in case he decided to cancel the transaction.
+OtherInfo | string | optional | Any alphanumeric code you might want to send to see it on the confirmation's response to keep track of your sales.
+
+
+
+### Response
+
+* 200 code (ok).
+
+
+### HTTP POST BACK SUCCESS
+
+If the transaction gets approved the user will be redirected back to your site, sending a POST to the SuccessURL with the parameters on the Json sample.
+
+
+### HTTP POST BACK ERROR
+
+If the transaction goes wrong the user will be redirected back to your site, sending a POST to OtherURL with the parameters on the Json sample.
+
+### PAY YOUR REQUEST
+
+Go to `https://webportalsandbox.choice.dev/HostedPaymentPage/{{tempToken}}`
+
+
+
 # Declined Response Codes
 
 ### Codes
