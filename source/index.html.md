@@ -6849,3 +6849,424 @@ Remember you will need to use an authentication token or the API Key in the head
 
 
 
+
+# Verify
+
+## Create verify
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Verify
+    {
+        public static void CreateVerify()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Verify");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var verify = new
+                {
+                    DeviceGuid = "b29725af-b067-4a35-9819-bbb31bdf8808",
+                    Card = new
+                    {
+                        CardNumber = "4532922657097402",
+                        CardHolderName = "Justin Troudeau",
+                        Cvv2 = "999",
+                        ExpirationDate = "2012",
+                        Customer = new
+                        {
+                            FirstName = "Justin",
+                            LastName = "Troudeau",
+                            Phone = "9177563051",
+                            City = "New York",
+                            State = "NY",
+                            Country = "US",
+                            Email = "justint@mailinator.com",
+                            Address1 = "111 11th Av.",
+                            Address2 = "",
+                            Zip = "10011",
+                            DateOfBirth = "1991-11-11",
+                            DriverLicenseNumber = "12345678",
+                            DriverLicenseState = "TX",
+                            SSN4 = "1210"
+                        }
+                    }
+                };
+
+                string json = JsonConvert.SerializeObject(verify);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+  "DeviceGuid" : "b29725af-b067-4a35-9819-bbb31bdf8808",
+  "Card":
+  {
+    "CardNumber" : "4532922657097402",
+    "CardHolderName" : "Justin Troudeau",
+    "Cvv2" : "999",
+    "ExpirationDate" : "2012",
+    "Customer":
+    {
+      "FirstName" : "Justin",
+      "LastName" : "Troudeau",
+      "Phone" : "9177563051",
+      "City" : "New York",
+      "State" : "NY",
+      "Country" : "US",
+      "Email" : "justint@mailinator.com",
+      "Address1" : "111 11th Av.",
+      "Address2" : "",
+      "Zip" : "10011",
+      "DateOfBirth" : "1991-11-11",
+      "DriverLicenseNumber" : "12345678",
+      "DriverLicenseState" : "TX",
+      "SSN4" : "1210"
+    }
+  }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "496b8523-7b36-42a4-9026-2b70cf684249",
+    "status": "Transaction - Approved",
+    "timeStamp": "2020-11-25T07:24:25.29-06:00",
+    "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+    "card": {
+        "card.irst6": "453292",
+        "card.last4": "7402",
+        "cardNumber": "hNDbeGr7VBgY7402",
+        "cardHolderName": "Justin Troudeau",
+        "cardType": "Visa",
+        "expirationDate": "2020-12",
+        "customer": {
+            "guid": "7879844d-33ff-4a2e-af5b-b72ca9487664",
+            "firstName": "Justin",
+            "lastName": "Troudeau",
+            "dateOfBirth": "1991-11-11T00:00:00",
+            "address1": "111 11th Av.",
+            "address2": "",
+            "zip": "10011",
+            "city": "New York",
+            "country": "US",
+            "phone": "9177563051",
+            "email": "justint@mailinator.com",
+            "ssN4": "1210",
+            "driverLicenseNumber": "12345678"
+        }
+    },
+    "cardDataSource": "INTERNET",
+    "processorStatusCode": "A0000",
+    "wasProcessed": true
+}
+```
+
+The Verify transaction is used when you want to know if the card data you have is valid and it’s ready to run other transactions like Auth Only or Sale. Therefore we are talking about a $0.00 amount transaction, no money is moved.
+
+This endpoint creates a verify.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/Verify`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device’s Guid.
+ |  | 
+**Card** |  | 
+CardNumber | string | Mandatory | Card number. Must be 16 characters.  (example: 4532538795426624) or token (example: FfL7exC7Xe2y6624).
+CardHolderName | string | Optional | Cardholder's name.
+Cvv2 | string | Optional | This is the three or four digit CVV code at the back side of the credit and debit card.
+ExpirationDate | date | Optional with Token | Card's expiry date in the YYMM format.
+Customer | object | Optional | Customer.
+ |  | 
+**Customer** |  | 
+FirstName | string | Optional | Customer's first name.
+LastName | string | Optional | Customer's last name.
+Phone | string | Optional | Customer's phone number. The phone number must be syntactically correct. For example, 4152345678.
+City | string | Optional | Customer's city.
+State | string | Optional | Customer's short name state. The ISO 3166-2 CA and US state or province code of a customer. Length = 2.
+Country | string | Optional | Customer's country. The ISO country code of a customer’s country. Length = 2 or 3.
+Email | string | Optional | Customer's valid email address.
+Address1 | string | Optional | Customer's address.
+Address2 | string | Optional | Customer's address line 2.
+Zip | string | Optional | Customer's zipcode. Length = 5.
+DateOfBirth | date | Optional | Customer's date of birth.<br><br>Allowed format:<br><br>YYYY-MM-DD.<br>For example: 2002-05-30
+DriverLicenseNumber | string | Optional | Customer's driver license number.
+DriverLicenseState | string | Mandatory when DriverLicenseNumber is provided | Customer's driver license short name state. The ISO 3166-2 CA and US state or province code of a customer. Length = 2.
+SSN4 | string | Mandatory when DOB is not submitted | Customer's social security number.
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Get verify
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Verify
+    {
+        public static void GetVerify()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/Verify/496b8523-7b36-42a4-9026-2b70cf684249");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+ 
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "496b8523-7b36-42a4-9026-2b70cf684249",
+    "status": "Transaction - Approved",
+    "timeStamp": "2020-11-25T07:24:25.29-06:00",
+    "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+    "card": {
+        "card.first6": "453292",
+        "card.last4": "7402",
+        "cardNumber": "hNDbeGr7VBgY7402",
+        "cardHolderName": "Justin Troudeau",
+        "cardType": "Visa",
+        "expirationDate": "2020-12",
+        "customer": {
+            "guid": "7879844d-33ff-4a2e-af5b-b72ca9487664",
+            "firstName": "Justin",
+            "lastName": "Troudeau",
+            "dateOfBirth": "1991-11-11T00:00:00",
+            "address1": "111 11th Av.",
+            "address2": "",
+            "zip": "10011",
+            "city": "New York",
+            "country": "US",
+            "phone": "9177563051",
+            "email": "justint@mailinator.com",
+            "ssN4": "1210",
+            "driverLicenseNumber": "12345678"
+        }
+    },
+    "cardDataSource": "INTERNET",
+    "processorStatusCode": "A0000",
+    "wasProcessed": true
+}
+```
+
+This endpoint gets a verify.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/Verify/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Verify’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
