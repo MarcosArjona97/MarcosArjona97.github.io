@@ -6379,3 +6379,473 @@ Remember you will need to use an authentication token or the API Key in the head
 
 
 
+
+# Return
+
+## Create return
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Return
+    {
+        public static void CreateReturn()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/returns");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var returns = new
+                {
+                    DeviceGuid = "b29725af-b067-4a35-9819-bbb31bdf8808",
+                    SaleGuid = "b4084e11-884d-468c-84d9-614c5b986fde",
+                    Amount = 19.74
+                };
+
+                string json = JsonConvert.SerializeObject(returns);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+  "DeviceGuid" : "b29725af-b067-4a35-9819-bbb31bdf8808",
+  "SaleGuid": "b4084e11-884d-468c-84d9-614c5b986fde",
+  "Amount": 19.74
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "9fb17f4e-b508-48d3-bd77-bb6813b42620",
+    "batchStatus": "Batch - Open",
+    "timeStamp": "2020-11-25T07:17:24.15-06:00",
+    "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+    "saleGuid": "b4084e11-884d-468c-84d9-614c5b986fde",
+    "status": "Transaction - Approved",
+    "amount": 19.74,
+    "StatementDescription": "This atribute is sent by the backend in the response",
+    "batchGuid": "58e8a0ad-d167-4015-a4b1-904b1e7f2b26",
+    "processorStatusCode": "A0014",
+    "wasProcessed": true,
+    "authCode": "VTLMC1",
+    "refNumber": "24814670",
+    "invoiceNumber": "11518",
+    "customerReceipt": "CHOICE MERCHANT SOLUTIONS\\n8320 S HARDY DR\\nTEMPE AZ 85284\\n11/25/2020 06:17:25\\n\\nCREDIT - VOID\\n\\nCARD # : **** **** **** 0213\\nCARD TYPE :MASTERCARD\\nEntry Mode : MANUAL\\n\\nTRANSACTION ID : 24814670\\nInvoice number : 11518\\nAUTH CODE : VTLMC1\\nVoid Amount:                    $19.74\\n--------------------------------------\\n\\n\\n\\nJohn Doe\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\nAPPROVED\\n\\n\\n\\n\\nCustomer Copy\\n",
+    "sale": {
+        "saleGuid": "b4084e11-884d-468c-84d9-614c5b986fde",
+        "status": "Transaction - Approved",
+        "batchStatus": "Batch - Closed",
+        "timeStamp": "2020-11-25T07:15:27.28-06:00",
+        "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+        "amount": 19.74,
+        "effectiveAmount": 19.74,
+        "grossAmount": 19.74,
+        "orderNumber": "11518",
+        "orderDate": "2020-11-24T00:00:00",
+        "cardDataSource": "INTERNET",
+        "customerLabel": "Patient",
+        "businessName": "Star Shoes California",
+        "customerID": "xt147",
+        "batchGuid": "b8d73296-e397-45c0-bb43-ba064e9750ac",
+        "processorStatusCode": "A0000",
+        "processorResponseMessage": "Success",
+        "wasProcessed": true,
+        "authCode": "VTLMC1",
+        "refNumber": "24814670",
+        "customerReceipt": "CHOICE MERCHANT SOLUTIONS\\n8320 S HARDY DR\\nTEMPE AZ 85284\\n11/25/2020 06:15:27\\n\\nCREDIT - SALE\\n\\nCARD # : **** **** **** 0213\\nCARD TYPE :MASTERCARD\\nEntry Mode : MANUAL\\n\\nTRANSACTION ID : 24814670\\n\\nAUTH CODE : VTLMC1\\nSubtotal:                       $19.74\\n--------------------------------------\\nTotal:                          $19.74\\n--------------------------------------\\n\\n\\n\\nJohn Doe\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\nAPPROVED\\n\\n\\n\\n\\nCustomer Copy\\n",
+        "customData": "order details",
+        "generatedBy": "maxduplessy",
+        "card": {
+            "card.first6": "530676",
+            "card.last4": "0213",
+            "cardNumber": "1zcGT7J4pkGh0213",
+            "cardHolderName": "John Doe",
+            "cardType": "Mastercard",
+            "expirationDate": "2022-07",
+            "customer": {
+                "guid": "4b63d92b-c0bf-436c-879d-5cacfcf1b708",
+                "firstName": "John",
+                "lastName": "Doe",
+                "dateOfBirth": "1987-07-07T00:00:00",
+                "address1": "107 7th Av.",
+                "address2": "",
+                "zip": "10007",
+                "city": "New York",
+                "state": "NY",
+                "country": "US",
+                "phone": "9177563007",
+                "email": "johnd@mailinator.com",
+                "ssN4": "1210",
+                "driverLicenseNumber": "12345678",
+                "driverLicenseState": "TX"
+            }
+        },
+        "associateCustomerCard": true,
+        "addressVerificationCode": "N",
+        "addressVerificationResult": "No Match",
+        "cvvVerificationCode": "M",
+        "cvvVerificationResult": "Passed"
+    }
+}
+```
+
+You can run a Return transaction when you need to refund either a partial or the full amount of a sale that has been settled. The Return amount doesn’t need to be the same as the total amount originally charged in the sale. To refund a sale you need to provide the SaleGuid or SaleReferenceNumber that you received when you ran the Sale.
+
+This endpoint creates a return.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/returns`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device’s Guid.
+SaleGuid | string | Mandatory when **SaleReferenceNumber** field is not sent | Sale’s Guid.
+SaleReferenceNumber | string | Mandatory when **SaleGuid** field is not sent | SaleReferenceNumber.
+Amount | decimal | Mandatory | Transaction's amount. Min. amt.: $0.50
+
+**Note: Send either SaleGuid or SaleReferenceNumber field in a request.**
+
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Get return
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Return
+    {
+        public static void GetReturn()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/returns/9fb17f4e-b508-48d3-bd77-bb6813b42620");
+                request.Method = "GET";
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        } 
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "9fb17f4e-b508-48d3-bd77-bb6813b42620",
+    "batchStatus": "Batch - Open",
+    "timeStamp": "2020-11-25T07:17:24.15-06:00",
+    "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+    "saleGuid": "b4084e11-884d-468c-84d9-614c5b986fde",
+    "status": "Transaction - Approved",
+    "amount": 19.74,
+    "batchGuid": "58e8a0ad-d167-4015-a4b1-904b1e7f2b26",
+    "processorStatusCode": "A0014",
+    "wasProcessed": true,
+    "authCode": "VTLMC1",
+    "refNumber": "24814670",
+    "invoiceNumber": "11518",
+    "customerReceipt": "CHOICE MERCHANT SOLUTIONS\\n8320 S HARDY DR\\nTEMPE AZ 85284\\n11/25/2020 06:17:25\\n\\nCREDIT - VOID\\n\\nCARD # : **** **** **** 0213\\nCARD TYPE :MASTERCARD\\nEntry Mode : MANUAL\\n\\nTRANSACTION ID : 24814670\\nInvoice number : 11518\\nAUTH CODE : VTLMC1\\nVoid Amount:                    $19.74\\n--------------------------------------\\n\\n\\n\\nJohn Doe\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\nAPPROVED\\n\\n\\n\\n\\nCustomer Copy\\n",
+    "sale": {
+        "guid": "b4084e11-884d-468c-84d9-614c5b986fde",
+        "status": "Transaction - Approved",
+        "batchStatus": "Batch - Closed",
+        "timeStamp": "2020-11-25T07:15:27.28-06:00",
+        "deviceGuid": "b29725af-b067-4a35-9819-bbb31bdf8808",
+        "amount": 19.74,
+        "effectiveAmount": 0.00,
+        "grossAmount": 19.74,
+        "orderNumber": "11518",
+        "orderDate": "2020-11-24T00:00:00",
+        "cardDataSource": "INTERNET",
+        "customerLabel": "Patient",
+        "businessName": "Star Shoes California",
+        "customerID": "xt147",
+        "batchGuid": "b8d73296-e397-45c0-bb43-ba064e9750ac",
+        "processorStatusCode": "A0000",
+        "processorResponseMessage": "Success",
+        "wasProcessed": true,
+        "authCode": "VTLMC1",
+        "refNumber": "24814670",
+        "customerReceipt": "CHOICE MERCHANT SOLUTIONS\\n8320 S HARDY DR\\nTEMPE AZ 85284\\n11/25/2020 06:15:27\\n\\nCREDIT - SALE\\n\\nCARD # : **** **** **** 0213\\nCARD TYPE :MASTERCARD\\nEntry Mode : MANUAL\\n\\nTRANSACTION ID : 24814670\\n\\nAUTH CODE : VTLMC1\\nSubtotal:                       $19.74\\n--------------------------------------\\nTotal:                          $19.74\\n--------------------------------------\\n\\n\\n\\nJohn Doe\\n\\nCUSTOMER ACKNOWLEDGES RECEIPT OF\\nGOODS AND/OR SERVICES IN THE AMOUNT\\nOF THE TOTAL SHOWN HEREON AND AGREES\\nTO PERFORM THE OBLIGATIONS SET FORTH\\nBY THE CUSTOMER`S AGREEMENT WITH THE\\nISSUER\\nAPPROVED\\n\\n\\n\\n\\nCustomer Copy\\n",
+        "customData": "order details",
+        "generatedBy": "maxduplessy",
+        "card": {
+            "card.first6": "530676",
+            "card.last4": "0213",
+            "cardNumber": "1zcGT7J4pkGh0213",
+            "cardHolderName": "John Doe",
+            "cardType": "Mastercard",
+            "expirationDate": "2022-07",
+            "customer": {
+                "guid": "4b63d92b-c0bf-436c-879d-5cacfcf1b708",
+                "firstName": "John",
+                "lastName": "Doe",
+                "dateOfBirth": "1987-07-07T00:00:00",
+                "address1": "107 7th Av.",
+                "address2": "",
+                "zip": "10007",
+                "city": "New York",
+                "state": "NY",
+                "country": "US",
+                "phone": "9177563007",
+                "email": "johnd@mailinator.com",
+                "ssN4": "1210",
+                "driverLicenseNumber": "12345678",
+                "driverLicenseState": "TX"
+            }
+        },
+        "associateCustomerCard": true,
+        "addressVerificationCode": "N",
+        "addressVerificationResult": "No Match",
+        "cvvVerificationCode": "M",
+        "cvvVerificationResult": "Passed"
+    }
+}
+```
+
+This endpoint gets a return.
+
+### HTTP Request
+
+`GET https://sandbox.choice.dev/api/v1/returns/<guid>`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+guid | Return’s guid to get
+
+### Response
+
+* 200 code (ok).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
