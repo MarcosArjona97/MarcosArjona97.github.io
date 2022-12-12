@@ -7270,3 +7270,186 @@ Remember you will need to use an authentication token or the API Key in the head
 
 
 
+
+# Tokenization
+
+## Create tokenization
+
+```csharp
+using System;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
+using System.Text;
+
+namespace ChoiceSample
+{
+    public class Tokenization
+    {
+        public static void CreateTokenization()
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://sandbox.choice.dev/api/v1/tokenization");
+                request.ContentType = "text/json";
+                request.Method = "POST";
+
+                var tokenization = new
+                {
+                    DeviceGuid = "F050E264-EABF-433E-8C81-916DFE110159",
+                    Card = new
+                    {
+                        CardNumber = "4024007194311436",
+                        CardHolderName = "John Doe",
+                        ExpirationDate = "2507",
+                        Customer = new
+                        {
+                            FirstName = "John",
+                            LastName = "Doe"
+                        }
+                    }
+                };
+
+                string json = JsonConvert.SerializeObject(tokenization);
+
+                request.Headers.Add("Authorization", "Bearer 1A089D6ziUybPZFQ3mpPyjt9OEx9yrCs7eQIC6V3A0lmXR2N6-seGNK16Gsnl3td6Ilfbr2Xf_EyukFXwnVEO3fYL-LuGw-L3c8WuaoxhPE8MMdlMPILJTIOV3lTGGdxbFXdKd9U03bbJ9TDUkqxHqq8_VyyjDrw7fs0YOob7bg0OovXTeWgIvZaIrSR1WFR06rYJ0DfWn-Inuf7re1-4SMOjY1ZoCelVwduWCBJpw1111cNbWtHJfObV8u1CVf0");
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+
+                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                try
+                {
+                    var response = (HttpWebResponse)request.GetResponse();
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string result = reader.ReadToEnd();
+                        Console.Write((int)response.StatusCode);
+                        Console.WriteLine();
+                        Console.WriteLine(response.StatusDescription);
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Response != null)
+                    {
+                        using (var errorResponse = (HttpWebResponse)wex.Response)
+                        {
+                            using (var reader = new StreamReader(errorResponse.GetResponseStream()))
+                            {
+                                string result = reader.ReadToEnd();
+                                Console.Write((int)errorResponse.StatusCode);
+                                Console.WriteLine();
+                                Console.WriteLine(errorResponse.StatusDescription);
+                                Console.WriteLine(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+    }
+}
+```
+
+> Json Example Request:
+
+```json
+{
+    "DeviceGuid": "F050E264-EABF-433E-8C81-916DFE110159",
+    "Card": {
+        "CardNumber": "4024007194311436",
+        "CardHolderName": "John Doe",
+        "ExpirationDate": "2507",
+        "Customer": {
+            "FirstName": "John",
+            "LastName": "Doe"
+        }
+    }
+}
+```
+
+> Json Example Response:
+
+```json
+{
+    "guid": "a2b8842a-a248-4759-ad71-9607a472e7cc",
+    "status": "Transaction - Approved",
+    "timeStamp": "2021-07-16T15:36:07.31",
+    "deviceGuid": "F050E264-EABF-433E-8C81-916DFE110159",
+    "cardDataSource": "INTERNET",
+    "processorStatusCode": "A0000",
+    "card": {
+        "card.first6": "402400",
+        "card.last4": "1436",
+        "cardNumber": "XR6ngXrNGdD31436",
+        "cardHolderName": "John Doe",
+        "cardType": "Visa",
+        "expirationDate": "2025-07"
+    }
+}
+```
+
+The Tokenization service is used when you want to obtain a tokenized value of the card number but no validation to be performed at the issuing bank.
+
+This endpoint creates a tokenization.
+
+### HTTP Request
+
+`POST https://sandbox.choice.dev/api/v1/tokenization`
+
+### Headers using token
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+Authorization | Token. Eg: "Bearer eHSN5rTBzqDozgAAlN1UlTMVuIT1zSiAZWCo6E..."
+
+### Headers using API Key
+
+Key | Value
+--------- | -------
+Content-Type | "application/json"
+UserAuthorization | API Key. Eg: "e516b6db-3230-4b1c-ae3f-e5379b774a80"
+
+### Query Parameters
+
+Parameter | Type |  M/C/O | Value
+--------- | ------- | ------- |-----------
+DeviceGuid | string | Mandatory | Device’s Guid.
+ |  | 
+**Card** |  | 
+CardNumber | string | Mandatory | Card number. Must be 16 characters.
+CardHolderName | string | Optional | Cardholder's name.
+ExpirationDate | date | Mandatory | Card's expiry date in the YYMM format.
+Customer | object | Optional | Customer.
+ |  | 
+**Customer** |  | 
+FirstName | string | Optional | Customer's first name.
+LastName | string | Optional | Customer's last name.
+
+### Response
+
+* 201 code (created).
+
+<aside class="success">
+Remember you will need to use an authentication token or the API Key in the header request for every transaction.
+</aside>
+
+
+
+
+
+
+
+
